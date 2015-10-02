@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="Close">Close</entry>
+<entry key="File">File</entry>
+<entry key="None">None</entry>
+<entry key="OK">OK</entry>
+<entry key="Open in a new window">Open in a new window</entry>
+<entry key="Open">Open</entry>
+<entry key="Save">Save</entry>
+
+</properties>
