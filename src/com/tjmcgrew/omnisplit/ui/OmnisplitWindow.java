@@ -29,6 +29,8 @@ import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.event.MouseInputListener;
+import java.awt.event.MouseEvent;
 
 import com.tjmcgrew.omnisplit.util.SplitTime;
 import org.apache.log4j.Logger;
@@ -36,16 +38,10 @@ import org.apache.log4j.Logger;
 /**
  * The main window class
  */
-public class OmnisplitWindow extends JFrame {
+public class OmnisplitWindow extends Window implements MouseInputListener {
 
-  private JMenuBar menuBar;
-  private JMenu fileMenu;
-  private JMenuItem newFileMenuItem;
-  private JMenuItem openFileMenuItem;
-  private JMenuItem saveFileMenuItem;
-  private JMenuItem closeFileMenuItem;
-  private JMenuItem exitFileMenuItem;
   private JPanel splitPanel;
+  private int oldMouseX, oldMouseY;
 
   private ArrayList elements = new ArrayList<SplitElement>();
 
@@ -53,13 +49,16 @@ public class OmnisplitWindow extends JFrame {
    * Creates a new split window.
    */
   public OmnisplitWindow () {
-    super();
+    super(null);
     this.setLayout(new BorderLayout());
     this.splitPanel = new JPanel(new GridLayout(0, 1));
     this.splitPanel.setBackground(Color.DARK_GRAY);
     this.splitPanel.setOpaque(true);
     this.add(this.splitPanel, BorderLayout.NORTH);
     this.add(new JPanel(), BorderLayout.CENTER);
+
+    this.addMouseListener(this);
+    this.addMouseMotionListener(this);
 
     Settings settings = Settings.getSettings( );
 //    int width = settings.getInt( "window.main.width" );
@@ -77,10 +76,7 @@ public class OmnisplitWindow extends JFrame {
     int width = 300;
     int height = 500;
     // end temporary stuff
-
     this.setBounds( x, y, width, height );
-
-//    this.setupMenu( );
 
     // more temporary stuff
     this.splitPanel.add(new SplitElement(new SplitTime("Stage 1",  60000, 60000)));
@@ -137,48 +133,29 @@ public class OmnisplitWindow extends JFrame {
     }
   }
 
-  private void setupMenu( ) {
-    Language language = Settings.getLanguage( );
-
-    this.menuBar = new JMenuBar( );
-    this.fileMenu = new JMenu( language.get( "File" ));
-    this.newFileMenuItem = new JMenuItem( 
-      language.get( "New Game" )+"...", KeyEvent.VK_N );
-    this.openFileMenuItem = new JMenuItem( 
-      language.get( "Open Splits" ) + "...", KeyEvent.VK_O );
-    this.saveFileMenuItem = new JMenuItem( 
-      language.get( "Save" ), KeyEvent.VK_S );
-    this.closeFileMenuItem = new JMenuItem( 
-      language.get( "Close Splits" ), KeyEvent.VK_C );
-    this.exitFileMenuItem = new JMenuItem( 
-      language.get( "Exit" ), KeyEvent.VK_X );
-
-    // FILE MENU
-    this.fileMenu.setMnemonic( KeyEvent.VK_F );
-    this.fileMenu.getAccessibleContext( ).setAccessibleDescription(
-      language.get( "Perform file operations" ));
-    this.fileMenu.add( this.newFileMenuItem );
-    this.fileMenu.add( this.openFileMenuItem );
-    this.fileMenu.add( this.saveFileMenuItem );
-    this.fileMenu.add( this.closeFileMenuItem );
-    this.fileMenu.add( this.exitFileMenuItem );
-
-    this.menuBar.add( this.fileMenu );
-
-    this.setJMenuBar( this.menuBar );
-
-    this.addMenuListeners( );
-  }
-
-  private void addMenuListeners( ) {
-//    this.newFileMenuItem.addActionListener( this );
-  }
-
-
   public static OmnisplitWindow newWindow() {
     OmnisplitWindow window = new OmnisplitWindow();
     return window;
   }
+
+  public void mouseClicked(MouseEvent e) { } // not implemented
+  public void mouseEntered(MouseEvent e) { } // not implemented
+  public void mouseExited(MouseEvent e) { } // not implemented
+  public void mousePressed(MouseEvent e) {
+    if (e.getButton() == 1) {
+      this.oldMouseX = e.getPoint().x;
+      this.oldMouseY = e.getPoint().y;
+    }
+  } // not implemented
+  public void mouseReleased(MouseEvent e) { } // not implemented
+  public void mouseMoved(MouseEvent e) { } // not implemented
+  public void mouseDragged(MouseEvent e) { 
+    if (e.getButton() == 1) {
+      this.setLocation(this.getX() + e.getPoint().x - oldMouseX,
+        this.getY() + e.getPoint().y - oldMouseY);
+    }
+  }
+
 }
 
 
