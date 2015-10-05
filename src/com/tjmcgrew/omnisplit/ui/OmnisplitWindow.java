@@ -4,6 +4,7 @@ import edu.purdue.bbc.util.Settings;
 import edu.purdue.bbc.util.Language;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -23,10 +24,13 @@ import java.util.List;
 import java.util.Map;
 import javax.json.*;
 import javax.swing.JFrame;
+import javax.swing.JWindow;
+import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.tjmcgrew.omnisplit.util.SplitTime;
 import org.apache.log4j.Logger;
 
 /**
@@ -41,17 +45,21 @@ public class OmnisplitWindow extends JFrame {
   private JMenuItem saveFileMenuItem;
   private JMenuItem closeFileMenuItem;
   private JMenuItem exitFileMenuItem;
+  private JPanel splitPanel;
 
-  private ArrayList elements = new ArrayList<SplitTimeElement>();
+  private ArrayList elements = new ArrayList<SplitElement>();
 
   /**
    * Creates a new split window.
    */
   public OmnisplitWindow () {
-    super("Omnisplit");
+    super();
     this.setLayout(new BorderLayout());
-
-    SplitTimeElement element = new SplitTimeElement();
+    this.splitPanel = new JPanel(new GridLayout(0, 1));
+    this.splitPanel.setBackground(Color.DARK_GRAY);
+    this.splitPanel.setOpaque(true);
+    this.add(this.splitPanel, BorderLayout.NORTH);
+    this.add(new JPanel(), BorderLayout.CENTER);
 
     Settings settings = Settings.getSettings( );
 //    int width = settings.getInt( "window.main.width" );
@@ -74,12 +82,19 @@ public class OmnisplitWindow extends JFrame {
 
 //    this.setupMenu( );
 
-    this.getContentPane( ).add( element, BorderLayout.CENTER );
+    // more temporary stuff
+    this.splitPanel.add(new SplitElement(new SplitTime("Stage 1",  60000, 60000)));
+    this.splitPanel.add(new SplitElement(new SplitTime("Stage 2", 120000, 60000)));
+    this.splitPanel.add(new SplitElement(new SplitTime("Stage 3", 180000, 60000))); 
+    this.splitPanel.add(new SplitElement(new SplitTime("Stage 4", 240000, 60000))); 
+    this.splitPanel.add(new SplitElement(new SplitTime("Stage 5", 300000, 60000))); 
+    // end temporary stuff
 
     this.setVisible( true );
 //    this.setExtendedState( 
 //      settings.getInt( "window.main.frameState", Frame.NORMAL ));
     this.repaint( );
+    this.validate( );
 
     this.addWindowListener( new WindowAdapter( ) {
       public void windowClosing( WindowEvent e ) {
