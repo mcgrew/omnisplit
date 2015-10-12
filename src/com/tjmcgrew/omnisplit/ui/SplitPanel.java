@@ -12,7 +12,7 @@ import com.tjmcgrew.omnisplit.util.*;
 /**
  * A class for displaying a single split time.
  */
-public class SplitElement extends JPanel {
+public class SplitPanel extends JPanel {
   private SplitTime split;
   private JLabel nameLabel;
   private JLabel currentLabel;
@@ -21,7 +21,7 @@ public class SplitElement extends JPanel {
   /**
    * Creates a new split element for displaying a single split.
    */
-  public SplitElement (SplitTime split) {
+  public SplitPanel (SplitTime split) {
     super(new BorderLayout());
     this.split = split;
     this.nameLabel = new JLabel(split.getName());

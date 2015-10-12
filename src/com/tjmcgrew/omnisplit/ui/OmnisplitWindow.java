@@ -1,38 +1,33 @@
 package com.tjmcgrew.omnisplit.ui;
 
-import edu.purdue.bbc.util.Settings;
 import edu.purdue.bbc.util.Language;
+import edu.purdue.bbc.util.Settings;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import javax.json.*;
 import javax.swing.JFrame;
-import javax.swing.JWindow;
-import javax.swing.JPanel;
-import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JWindow;
 import javax.swing.event.MouseInputListener;
-import java.awt.event.MouseEvent;
 
 import com.tjmcgrew.omnisplit.util.SplitTime;
+import com.tjmcgrew.omnisplit.ui.RunPanel;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,10 +35,8 @@ import org.apache.log4j.Logger;
  */
 public class OmnisplitWindow extends Window implements MouseInputListener {
 
-  private JPanel splitPanel;
   private int oldMouseX, oldMouseY;
-
-  private ArrayList elements = new ArrayList<SplitElement>();
+  private RunPanel runPanel;
 
   /**
    * Creates a new split window.
@@ -51,11 +44,8 @@ public class OmnisplitWindow extends Window implements MouseInputListener {
   public OmnisplitWindow () {
     super(null);
     this.setLayout(new BorderLayout());
-    this.splitPanel = new JPanel(new GridLayout(0, 1));
-    this.splitPanel.setBackground(Color.DARK_GRAY);
-    this.splitPanel.setOpaque(true);
-    this.add(this.splitPanel, BorderLayout.NORTH);
-    this.add(new JPanel(), BorderLayout.CENTER);
+    this.runPanel = new RunPanel(null);
+    this.add(this.runPanel, BorderLayout.CENTER);
 
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
@@ -77,14 +67,6 @@ public class OmnisplitWindow extends Window implements MouseInputListener {
     int height = 500;
     // end temporary stuff
     this.setBounds( x, y, width, height );
-
-    // more temporary stuff
-    this.splitPanel.add(new SplitElement(new SplitTime("Stage 1",  60000, 60000)));
-    this.splitPanel.add(new SplitElement(new SplitTime("Stage 2", 120000, 60000)));
-    this.splitPanel.add(new SplitElement(new SplitTime("Stage 3", 180000, 60000))); 
-    this.splitPanel.add(new SplitElement(new SplitTime("Stage 4", 240000, 60000))); 
-    this.splitPanel.add(new SplitElement(new SplitTime("Stage 5", 300000, 60000))); 
-    // end temporary stuff
 
     this.setVisible( true );
 //    this.setExtendedState( 

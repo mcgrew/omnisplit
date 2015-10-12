@@ -15,6 +15,7 @@ import com.tjmcgrew.omnisplit.ui.*;
  * The main class
  */
 public class Omnisplit {
+
   public static void main (String [] args) {
     OmnisplitWindow.newWindow();
   }
