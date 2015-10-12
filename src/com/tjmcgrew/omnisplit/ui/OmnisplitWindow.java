@@ -44,7 +44,7 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
    * Creates a new split window.
    */
   public OmnisplitWindow () {
-    super();
+    super("Omnisplit");
     this.setUndecorated(true);
     this.setLayout(new BorderLayout());
     this.runPanel = new RunPanel(new Run());
@@ -130,22 +130,38 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   public void mouseClicked(MouseEvent e) { } // not implemented
   public void mouseEntered(MouseEvent e) { } // not implemented
   public void mouseExited(MouseEvent e) { } // not implemented
+  /**
+	 * Remembers the position of the mouse click for movement and resizing.
+	 * 
+	 * @param e The MouseEvent associated with the press.
+	 */
   public void mousePressed(MouseEvent e) {
-    if (e.getButton() == 1) {
+    if (this.translateButton(e) == MouseEvent.BUTTON1) {
       this.oldMouseX = e.getPoint().x;
       this.oldMouseY = e.getPoint().y;
     }
   } // not implemented
   public void mouseReleased(MouseEvent e) { } // not implemented
   public void mouseMoved(MouseEvent e) { } // not implemented
+  /**
+	 * Since there is no decorations and thus no way to reposition/resize the 
+	 * window, dragging the window anywhere will move it, and shift+drag to 
+	 * resize.
+	 * 
+	 * @param e The MouseEvent associated with the drag.
+	 */
   public void mouseDragged(MouseEvent e) { 
-    if (e.getButton() == 1) {
+		int button = this.translateButton(e);
+    if (button == MouseEvent.BUTTON3) {
+			// open a context menu
+		} else if (button == MouseEvent.BUTTON1) {
       if (e.isShiftDown()) {
         this.setSize(this.getWidth() + e.getPoint().x - oldMouseX,
           this.getHeight() + e.getPoint().y - oldMouseY);
         oldMouseX = e.getPoint().x;
         oldMouseY = e.getPoint().y;
       } else {
+			 // TODO: This has some erratic movement on Linux. Look into it.
         this.setLocation(this.getX() + e.getPoint().x - oldMouseX,
           this.getY() + e.getPoint().y - oldMouseY);
       }
@@ -166,6 +182,23 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   }
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
+
+	private int translateButton(MouseEvent e) {
+		// also check for NO_BUTTON since java events are broken in some
+		// ipmlementations (e.g. in Wayland)
+		int button = e.getButton();
+		switch(button) {
+			case MouseEvent.NOBUTTON:
+			case MouseEvent.BUTTON1:
+				if (!e.isMetaDown() && !e.isControlDown()) {
+					return MouseEvent.BUTTON1;
+				}
+			case MouseEvent.BUTTON3:
+				return MouseEvent.BUTTON3;
+			default:
+				return button;
+		}
+	}
 
 }
 
