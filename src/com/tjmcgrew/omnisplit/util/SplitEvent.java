@@ -7,7 +7,7 @@ public class SplitEvent {
   private SplitTime source;
 
   public static enum Type {
-    START, END, PAUSE, RESUME
+    START, END, PAUSE, RESUME, UPDATE
   }
 
   public SplitEvent(SplitEvent.Type type, SplitTime source) {

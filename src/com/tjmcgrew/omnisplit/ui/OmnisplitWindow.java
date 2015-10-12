@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -26,14 +27,15 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.event.MouseInputListener;
 
-import com.tjmcgrew.omnisplit.util.SplitTime;
+import com.tjmcgrew.omnisplit.util.Run;
 import com.tjmcgrew.omnisplit.ui.RunPanel;
 import org.apache.log4j.Logger;
 
 /**
  * The main window class
  */
-public class OmnisplitWindow extends Window implements MouseInputListener {
+public class OmnisplitWindow extends JFrame implements MouseInputListener,
+    KeyListener {
 
   private int oldMouseX, oldMouseY;
   private RunPanel runPanel;
@@ -42,13 +44,15 @@ public class OmnisplitWindow extends Window implements MouseInputListener {
    * Creates a new split window.
    */
   public OmnisplitWindow () {
-    super(null);
+    super();
+    this.setUndecorated(true);
     this.setLayout(new BorderLayout());
-    this.runPanel = new RunPanel(null);
+    this.runPanel = new RunPanel(new Run());
     this.add(this.runPanel, BorderLayout.CENTER);
 
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
+    this.addKeyListener(this);
 
     Settings settings = Settings.getSettings( );
 //    int width = settings.getInt( "window.main.width" );
@@ -115,6 +119,9 @@ public class OmnisplitWindow extends Window implements MouseInputListener {
     }
   }
 
+  public void openFile() {
+  }
+
   public static OmnisplitWindow newWindow() {
     OmnisplitWindow window = new OmnisplitWindow();
     return window;
@@ -133,10 +140,32 @@ public class OmnisplitWindow extends Window implements MouseInputListener {
   public void mouseMoved(MouseEvent e) { } // not implemented
   public void mouseDragged(MouseEvent e) { 
     if (e.getButton() == 1) {
-      this.setLocation(this.getX() + e.getPoint().x - oldMouseX,
-        this.getY() + e.getPoint().y - oldMouseY);
+      if (e.isShiftDown()) {
+        this.setSize(this.getWidth() + e.getPoint().x - oldMouseX,
+          this.getHeight() + e.getPoint().y - oldMouseY);
+        oldMouseX = e.getPoint().x;
+        oldMouseY = e.getPoint().y;
+      } else {
+        this.setLocation(this.getX() + e.getPoint().x - oldMouseX,
+          this.getY() + e.getPoint().y - oldMouseY);
+      }
     }
   }
+  public void keyPressed(KeyEvent e) {
+    int code = e.getKeyCode();
+    int modifiers = e.getModifiers();
+    if (modifiers == InputEvent.CTRL_MASK || modifiers == InputEvent.META_MASK) {
+      if (code == KeyEvent.VK_O) {
+        System.out.println("Open file");
+      }
+    } else if (code == KeyEvent.VK_SPACE) {
+      this.runPanel.getRun().start();
+    } else if (code == KeyEvent.VK_BACK_SPACE) {
+      this.runPanel.getRun().pause();
+    }
+  }
+  public void keyReleased(KeyEvent e) {}
+  public void keyTyped(KeyEvent e) {}
 
 }
 

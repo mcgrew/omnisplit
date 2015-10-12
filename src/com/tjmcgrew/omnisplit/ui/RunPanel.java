@@ -19,9 +19,11 @@ public class RunPanel extends JPanel {
   private MainTimerLabel mainTimerLabel;
   private SplitPanel bestPanel;
   private SplitPanel sobPanel;
+  private Run run;
 
   public RunPanel (Run run) {
     super(new BorderLayout());
+    this.run = run;
     this.bestPanel = new SplitPanel(new SplitTime("Sum of Bests", 30000, Long.MIN_VALUE));
     this.sobPanel = new SplitPanel(new SplitTime("Previous Best", 30000, Long.MIN_VALUE));
     this.mainTimerLabel = new MainTimerLabel();
@@ -51,6 +53,10 @@ public class RunPanel extends JPanel {
     this.add(this.splitsPanel, BorderLayout.NORTH);
     this.add(centerPanel, BorderLayout.CENTER);
     this.add(bottomPanel, BorderLayout.SOUTH);
+  }
+
+  public Run getRun() {
+    return this.run;
   }
 
   private class MainTimerLabel extends JLabel {

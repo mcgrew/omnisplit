@@ -3,13 +3,20 @@ package com.tjmcgrew.omnisplit.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Run {
+import edu.purdue.bbc.util.DaemonListener;
+import edu.purdue.bbc.util.UpdateDaemon;
+
+// TODO: Have this class extend SplitTime
+public class Run implements DaemonListener {
 
   private long pb;
 
   private String name;
   private List<SplitTime> splits;
   private int currentSplit;
+  private long startTime;
+  private long pauseTime;
+  private long endTime;
 
   /**
    * Creates a new empty run.
@@ -86,6 +93,7 @@ public class Run {
     this.name = name;
     this.splits = splits;
     this.pb = pb;
+    this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
   }
 
   /**
@@ -112,20 +120,33 @@ public class Run {
    */
   public void start() {
     this.currentSplit = 0;
+    System.out.println("Run start");
   }
 
   /**
    * Pauses the current run.
    */
   public void pause() {
-    this.splits.get(this.currentSplit).pause();
+    if (this.pauseTime == Long.MIN_VALUE) {
+      this.pauseTime = System.currentTimeMillis();
+      this.splits.get(this.currentSplit).pause();
+    } else {
+      this.reset();
+    }
   }
 
   /**
    * Advances to the next split.
    */
   public void next() {
+    this.splits.get(this.currentSplit).end();
     this.currentSplit++;
+    this.splits.get(this.currentSplit).start();
+  }
+
+  public void reset() {
+    System.out.println("Reset run");
+    this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
   }
 
   /**
@@ -162,5 +183,20 @@ public class Run {
    */
   public String setName() {
     return this.name;
+  }
+
+  /**
+   * Updates any listeners of this run with the new time.
+   * 
+   * @param 
+   * @return 
+   */
+  public void update() {
+    this.splits.get(this.currentSplit).update();
+    // fire update event
+  }
+  // temporary
+  public void daemonUpdate() {
+    this.update();
   }
 }

@@ -163,4 +163,7 @@ public class SplitTime {
       return String.format("%d%2d:%02d.%02d", hours, min, sec, ms);
   }
 
+  public void update() {
+    // fire update event
+  }
 }
