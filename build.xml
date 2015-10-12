@@ -123,7 +123,7 @@
         <!-- ============ TARGET: TEST ===================== -->
         <target name="test" depends="compile">
             <mkdir dir="${build_dir}/tests"/>
-            <javac srcdir="tests" target="1.5" source="1.5" destdir="${build_dir}/tests"
+            <javac srcdir="tests" target="1.7" source="1.7" destdir="${build_dir}/tests"
                      debug="on" debuglevel="lines,vars,source" deprecation="true"
                      includeantruntime="false">
                 <classpath>
