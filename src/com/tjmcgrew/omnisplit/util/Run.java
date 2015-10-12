@@ -195,8 +195,4 @@ public class Run implements DaemonListener {
     this.splits.get(this.currentSplit).update();
     // fire update event
   }
-  // temporary
-  public void daemonUpdate() {
-    this.update();
-  }
 }
