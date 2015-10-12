@@ -7,16 +7,10 @@ import edu.purdue.bbc.util.DaemonListener;
 import edu.purdue.bbc.util.UpdateDaemon;
 
 // TODO: Have this class extend SplitTime
-public class Run implements DaemonListener {
+public class Run extends SplitTime implements DaemonListener {
 
-  private long pb;
-
-  private String name;
   private List<SplitTime> splits;
   private int currentSplit;
-  private long startTime;
-  private long pauseTime;
-  private long endTime;
 
   /**
    * Creates a new empty run.
@@ -90,10 +84,8 @@ public class Run implements DaemonListener {
    * @param pb The personal best time for this split.
    */
   public Run(String name, ArrayList splits, long pb) {
-    this.name = name;
+		super(name, pb, Long.MIN_VALUE);
     this.splits = splits;
-    this.pb = pb;
-    this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
   }
 
   /**
@@ -119,6 +111,7 @@ public class Run implements DaemonListener {
    * Starts a new timed run.
    */
   public void start() {
+		super.start();
     this.currentSplit = 0;
     System.out.println("Run start");
   }
@@ -127,8 +120,8 @@ public class Run implements DaemonListener {
    * Pauses the current run.
    */
   public void pause() {
+		super.pause();
     if (this.pauseTime == Long.MIN_VALUE) {
-      this.pauseTime = System.currentTimeMillis();
       this.splits.get(this.currentSplit).pause();
     } else {
       this.reset();
@@ -140,49 +133,17 @@ public class Run implements DaemonListener {
    */
   public void next() {
     this.splits.get(this.currentSplit).end();
-    this.currentSplit++;
-    this.splits.get(this.currentSplit).start();
+		if (this.currentSplit < this.splits.size()) {
+			this.currentSplit++;
+			this.splits.get(this.currentSplit).start();
+		} else {
+			this.end();
+		}
   }
 
   public void reset() {
     System.out.println("Reset run");
     this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
-  }
-
-  /**
-   * Sets the personal best time for this run.
-   * 
-   * @param pb The new personal best.
-   */
-  public void setPB(long pb) {
-    this.pb = pb;
-  }
-  
-  /**
-   * Gets the current personal best time for this run.
-   * 
-   * @return The current personal best.
-   */
-  public long getPB() {
-    return this.pb;
-  }
-
-  /**
-   * Sets the name of this run, usually the game title.
-   * 
-   * @param name The new name.
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  /**
-   * Gets the current name for this run.
-   * 
-   * @return The name of this run.
-   */
-  public String setName() {
-    return this.name;
   }
 
   /**
@@ -192,7 +153,7 @@ public class Run implements DaemonListener {
    * @return 
    */
   public void update() {
+		super.update();
     this.splits.get(this.currentSplit).update();
-    // fire update event
   }
 }

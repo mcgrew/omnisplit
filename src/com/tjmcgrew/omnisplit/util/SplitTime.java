@@ -1,15 +1,17 @@
 package com.tjmcgrew.omnisplit.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SplitTime {
 
-  private String name;
-  private long bestTime;
-  private long bestSegment;
-  private long start;
-  private long end;
-  private ArrayList <SplitListener> listeners;
+  protected String name;
+  protected long bestSegment;
+  protected long bestTime;
+  protected long endTime;
+  protected long pauseTime;
+  protected long startTime;
+  protected List <SplitListener> listeners;
 
   /**
    * Creates a new SplitTime with no defined times.
@@ -40,6 +42,8 @@ public class SplitTime {
     this.name = name;
     this.bestTime = bestTime;
     this.bestSegment = bestSegment;
+    this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
+		this.listeners = new ArrayList();
   }
 
   /**
@@ -64,19 +68,39 @@ public class SplitTime {
     this.bestSegment = time;
   }
 
+  /**
+	 * Gets the current best segment for this split.
+	 * 
+	 * @return The current best segment.
+	 */
   public long getBestSegment() {
     return this.bestSegment;
   }
 
+  /**
+   * Sets the name of this split.
+   * 
+   * @param name The new name.
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * Gets the current name for this split.
+   * 
+   * @return The name of this run.
+   */
   public String getName() {
     return this.name;
   }
+
 
   /**
    * Starts this split.
    */
   public void start() {
-    this.start = System.currentTimeMillis();
+    this.startTime = System.currentTimeMillis();
     this.fireEvent(new SplitEvent(SplitEvent.Type.START, this));
   }
 
@@ -84,7 +108,7 @@ public class SplitTime {
    * Ends this split.
    */
   public void end() {
-    this.end = System.currentTimeMillis();
+    this.endTime = System.currentTimeMillis();
     this.fireEvent(new SplitEvent(SplitEvent.Type.END, this));
   }
 
@@ -92,16 +116,21 @@ public class SplitTime {
    * Pauses the run.
    */
   public void pause() {
-    // do something here
-    this.fireEvent(new SplitEvent(SplitEvent.Type.PAUSE, this));
+		if (this.pauseTime != Long.MIN_VALUE) {
+			this.pauseTime = System.currentTimeMillis();
+			this.fireEvent(new SplitEvent(SplitEvent.Type.PAUSE, this));
+		}
   }
 
   /**
    * Resumes the run.
    */
   public void resume() {
-    // do something here
-    this.fireEvent(new SplitEvent(SplitEvent.Type.RESUME, this));
+		if (this.pauseTime != Long.MIN_VALUE) {
+			this.startTime += System.currentTimeMillis() - this.pauseTime;
+			this.pauseTime = Long.MIN_VALUE;
+			this.fireEvent(new SplitEvent(SplitEvent.Type.RESUME, this));
+		}
   }
 
   /**
@@ -110,7 +139,7 @@ public class SplitTime {
    * @return The time for the split.
    */
   public long getTime() {
-    return this.end - this.start;
+    return this.endTime - this.startTime;
   }
   
   /**
@@ -164,6 +193,6 @@ public class SplitTime {
   }
 
   public void update() {
-    // fire update event
+		this.fireEvent(new SplitEvent(SplitEvent.Type.UPDATE, this));
   }
 }
