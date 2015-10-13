@@ -116,7 +116,7 @@ public class SplitTime {
    * Pauses the run.
    */
   public void pause() {
-		if (this.pauseTime != Long.MIN_VALUE) {
+		if (!this.isPaused()) {
 			this.pauseTime = System.currentTimeMillis();
 			this.fireEvent(new SplitEvent(SplitEvent.Type.PAUSE, this));
 		}
@@ -126,11 +126,24 @@ public class SplitTime {
    * Resumes the run.
    */
   public void resume() {
-		if (this.pauseTime != Long.MIN_VALUE) {
+		if (this.isPaused()) {
 			this.startTime += System.currentTimeMillis() - this.pauseTime;
 			this.pauseTime = Long.MIN_VALUE;
 			this.fireEvent(new SplitEvent(SplitEvent.Type.RESUME, this));
 		}
+  }
+
+  public boolean isActive() {
+    return this.startTime != Long.MIN_VALUE && 
+        this.endTime == Long.MIN_VALUE;
+  }
+
+  public boolean isPaused() {
+    return this.pauseTime != Long.MIN_VALUE;
+  }
+
+  public boolean isStarted() {
+    return this.startTime != Long.MIN_VALUE;
   }
 
   /**
@@ -139,7 +152,14 @@ public class SplitTime {
    * @return The time for the split.
    */
   public long getTime() {
-    return this.endTime - this.startTime;
+    if (this.isPaused()) {
+        return this.pauseTime - this.startTime;
+    } else if (this.isActive()) {
+        return System.currentTimeMillis() - this.startTime;
+    } else if (this.isStarted()) {
+        return this.endTime - this.startTime;
+    } 
+    return 0L;
   }
   
   /**

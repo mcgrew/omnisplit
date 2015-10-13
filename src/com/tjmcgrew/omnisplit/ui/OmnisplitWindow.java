@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.json.*;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -28,6 +30,7 @@ import javax.swing.JWindow;
 import javax.swing.event.MouseInputListener;
 
 import com.tjmcgrew.omnisplit.util.Run;
+import com.tjmcgrew.omnisplit.util.SplitTime;
 import com.tjmcgrew.omnisplit.ui.RunPanel;
 import org.apache.log4j.Logger;
 
@@ -47,7 +50,15 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
     super("Omnisplit");
     this.setUndecorated(true);
     this.setLayout(new BorderLayout());
-    this.runPanel = new RunPanel(new Run());
+    // temporary stuff
+    List<SplitTime> splits = new ArrayList();
+    splits.add(new SplitTime("Stage 1",  6000, 6000));
+    splits.add(new SplitTime("Stage 2", 12000, 6000));
+    splits.add(new SplitTime("Stage 3", 18000, 6000));
+    splits.add(new SplitTime("Stage 4", 24000, 6000));
+    splits.add(new SplitTime("Stage 5", 30000, 6000));
+    // end temporary stuff
+    this.runPanel = new RunPanel(new Run("Cheetahmen II", splits));
     this.add(this.runPanel, BorderLayout.CENTER);
 
     this.addMouseListener(this);
@@ -171,13 +182,30 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
     int code = e.getKeyCode();
     int modifiers = e.getModifiers();
     if (modifiers == InputEvent.CTRL_MASK || modifiers == InputEvent.META_MASK) {
-      if (code == KeyEvent.VK_O) {
-        System.out.println("Open file");
+      switch (code) {
+        case KeyEvent.VK_0:
+          System.out.println("Open file");
+          break;
+        default:
+          break;
       }
-    } else if (code == KeyEvent.VK_SPACE) {
-      this.runPanel.getRun().start();
-    } else if (code == KeyEvent.VK_BACK_SPACE) {
-      this.runPanel.getRun().pause();
+    } else {
+      Run run = this.runPanel.getRun();
+      switch (code) {
+        case KeyEvent.VK_SPACE:
+          if (run.isPaused())
+            run.resume();
+          else if (run.isActive())
+            run.next();
+          else if (!run.isStarted())
+            run.start();
+          break;
+        case KeyEvent.VK_BACK_SPACE:
+          run.pause();
+          break;
+        default:
+          break;
+      }
     }
   }
   public void keyReleased(KeyEvent e) {}

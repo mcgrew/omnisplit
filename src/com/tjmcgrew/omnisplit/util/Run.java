@@ -6,11 +6,11 @@ import java.util.List;
 import edu.purdue.bbc.util.DaemonListener;
 import edu.purdue.bbc.util.UpdateDaemon;
 
-// TODO: Have this class extend SplitTime
 public class Run extends SplitTime implements DaemonListener {
 
   private List<SplitTime> splits;
   private int currentSplit;
+  private UpdateDaemon updater;
 
   /**
    * Creates a new empty run.
@@ -42,7 +42,7 @@ public class Run extends SplitTime implements DaemonListener {
    * 
    * @param splits An array of splits for this run.
    */
-  public Run(ArrayList splits) {
+  public Run(List splits) {
     this("", splits, Long.MIN_VALUE);
   }
 
@@ -52,7 +52,7 @@ public class Run extends SplitTime implements DaemonListener {
    * @param name The name of this run.
    * @param splits An array of splits for this run.
    */
-  public Run(String name, ArrayList splits) {
+  public Run(String name, List splits) {
     this(name, splits, Long.MIN_VALUE);
   }
 
@@ -72,7 +72,7 @@ public class Run extends SplitTime implements DaemonListener {
    * @param splits An array of splits for this run.
    * @param pb The personal best time for this split.
    */
-  public Run(ArrayList splits, long pb) {
+  public Run(List splits, long pb) {
     this("", splits, pb);
   }
     
@@ -83,9 +83,12 @@ public class Run extends SplitTime implements DaemonListener {
    * @param splits An array of splits for this run.
    * @param pb The personal best time for this split.
    */
-  public Run(String name, ArrayList splits, long pb) {
+  public Run(String name, List splits, long pb) {
 		super(name, pb, Long.MIN_VALUE);
     this.splits = splits;
+    this.updater = UpdateDaemon.create(100);
+    this.updater.update(this);
+    this.updater.start();
   }
 
   /**
@@ -113,7 +116,7 @@ public class Run extends SplitTime implements DaemonListener {
   public void start() {
 		super.start();
     this.currentSplit = 0;
-    System.out.println("Run start");
+    this.splits.get(this.currentSplit).start();
   }
 
   /**
@@ -121,11 +124,12 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public void pause() {
 		super.pause();
-    if (this.pauseTime == Long.MIN_VALUE) {
-      this.splits.get(this.currentSplit).pause();
-    } else {
-      this.reset();
-    }
+    this.splits.get(this.currentSplit).pause();
+  }
+
+  public void resume() {
+    super.resume();
+    this.splits.get(this.currentSplit).resume();
   }
 
   /**
@@ -142,8 +146,11 @@ public class Run extends SplitTime implements DaemonListener {
   }
 
   public void reset() {
-    System.out.println("Reset run");
     this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
+  }
+
+  public List<SplitTime> getSplits() {
+    return this.splits;
   }
 
   /**
@@ -154,6 +161,7 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public void update() {
 		super.update();
+    this.updater.update(this);
     this.splits.get(this.currentSplit).update();
   }
 }
