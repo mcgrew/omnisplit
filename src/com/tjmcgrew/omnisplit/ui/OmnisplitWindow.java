@@ -2,6 +2,7 @@ package com.tjmcgrew.omnisplit.ui;
 
 import edu.purdue.bbc.util.Language;
 import edu.purdue.bbc.util.Settings;
+import edu.purdue.bbc.util.ProcessUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -86,9 +87,6 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
     this.setVisible( true );
 //    this.setExtendedState( 
 //      settings.getInt( "window.main.frameState", Frame.NORMAL ));
-    this.repaint( );
-    this.validate( );
-
     this.addWindowListener( new WindowAdapter( ) {
       public void windowClosing( WindowEvent e ) {
         OmnisplitWindow w = (OmnisplitWindow)e.getSource( );
@@ -109,6 +107,11 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
         OmnisplitWindow.checkWindowCount( );
       }
     });
+		// This is stupid, but sometimes Java on Linux doesn't paint the initial 
+		// window. This seems to fix it.
+		ProcessUtils.sleep(1000);
+    this.repaint( );
+
   }
 
   private static int getWindowCount( ) {
