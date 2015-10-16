@@ -11,6 +11,7 @@ public class SplitTime {
   protected long endTime;
   protected long pauseTime;
   protected long startTime;
+  protected long runStartTime;
   protected List <SplitListener> listeners;
 
   /**
@@ -43,6 +44,7 @@ public class SplitTime {
     this.bestTime = bestTime;
     this.bestSegment = bestSegment;
     this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
+    this.runStartTime = Long.MIN_VALUE;
 		this.listeners = new ArrayList();
   }
 
@@ -95,42 +97,92 @@ public class SplitTime {
     return this.name;
   }
 
+  public long getEndTime() {
+    return this.endTime;
+  }
+
+  public long getStartTime() {
+    return this.startTime;
+  }
+
+  /**
+   * Sets the start time of the run (used for displaying split time comparisons)
+   * 
+   * @param runStart The run start time.
+   */
+  public void setRunStart(long runStart) {
+    this.runStartTime = runStart;
+  }
+
+  /**
+   * Sets the start time of the run (used for displaying split time comparisons)
+   * 
+   * @return The run start time.
+   */
+  public long getRunStart() {
+    return this.runStartTime;
+  }
+
+  /**
+   * Shifts all previously set times by this amount (for pause compensation).
+   * 
+   * @param amount The number of milliseconds to shift by.
+   */
+  public void shift(long amount) {
+    if (this.startTime != Long.MIN_VALUE)
+      this.startTime += amount;
+      // pretty sure we don't need this
+//    if (this.pauseTime != Long.MIN_VALUE)
+//      this.pauseTime += amount;
+    if (this.endTime != Long.MIN_VALUE)
+      this.endTime += amount;
+    if (this.runStartTime != Long.MIN_VALUE)
+      this.runStartTime += amount;
+  }
 
   /**
    * Starts this split.
    */
-  public void start() {
+  public boolean start() {
     this.startTime = System.currentTimeMillis();
+    if (this.runStartTime == Long.MIN_VALUE)
+      this.runStartTime = System.currentTimeMillis();
     this.fireEvent(new SplitEvent(SplitEvent.Type.START, this));
+    return true;
   }
 
   /**
    * Ends this split.
    */
-  public void end() {
+  public boolean end() {
     this.endTime = System.currentTimeMillis();
     this.fireEvent(new SplitEvent(SplitEvent.Type.END, this));
+    return true;
   }
 
   /**
    * Pauses the run.
    */
-  public void pause() {
+  public boolean pause() {
 		if (!this.isPaused()) {
 			this.pauseTime = System.currentTimeMillis();
 			this.fireEvent(new SplitEvent(SplitEvent.Type.PAUSE, this));
+      return true;
 		}
+    return false;
   }
 
   /**
    * Resumes the run.
    */
-  public void resume() {
+  public boolean resume() {
 		if (this.isPaused()) {
-			this.startTime += System.currentTimeMillis() - this.pauseTime;
+//			this.startTime += System.currentTimeMillis() - this.pauseTime;
 			this.pauseTime = Long.MIN_VALUE;
 			this.fireEvent(new SplitEvent(SplitEvent.Type.RESUME, this));
+      return true;
 		}
+    return false;
   }
 
   public boolean isActive() {
@@ -146,6 +198,26 @@ public class SplitTime {
     return this.startTime != Long.MIN_VALUE;
   }
 
+  public boolean isEnded() {
+    return this.endTime != Long.MIN_VALUE;
+  }
+
+  /**
+   * Gets the total segment time for this split.
+   * 
+   * @return The time for the split.
+   */
+  public long getSegmentTime() {
+    if (this.isPaused()) {
+        return this.pauseTime - this.startTime;
+    } else if (this.isActive()) {
+        return System.currentTimeMillis() - this.startTime;
+    } else if (this.isStarted()) {
+        return this.endTime - this.startTime;
+    } 
+    return 0L;
+  }
+
   /**
    * Gets the total time for this split.
    * 
@@ -153,11 +225,11 @@ public class SplitTime {
    */
   public long getTime() {
     if (this.isPaused()) {
-        return this.pauseTime - this.startTime;
+        return this.pauseTime - this.runStartTime;
     } else if (this.isActive()) {
-        return System.currentTimeMillis() - this.startTime;
+        return System.currentTimeMillis() - this.runStartTime;
     } else if (this.isStarted()) {
-        return this.endTime - this.startTime;
+        return this.endTime - this.runStartTime;
     } 
     return 0L;
   }
@@ -193,23 +265,33 @@ public class SplitTime {
     }
   }
 
+  public static String formatTime(long time) {
+    return formatTime(time, false);
+  }
+
   /**
    * Formats a timestamp as hh:mm:ss
    * 
    * @param time The time to format as a long
+   * @param forceSign force display of '+' for positive numbers
    * @return A string containing the formatted time.
    */
-  public static String formatTime(long time) {
-    int ms = (int)(time % 100);
-    int sec = (int)(time / 100 % 60);
-    int min = (int)(time / 6000 % 60);
-    int hours = (int)(time / 360000);
-    if (time < 6000) 
-      return String.format("%d.%02d", sec, ms);
-    else if (time < 360000)
-      return String.format("%d:%02d.%02d", min, sec, ms);
-    else
-      return String.format("%d%2d:%02d.%02d", hours, min, sec, ms);
+  public static String formatTime(long time, boolean forceSign) {
+    String first = forceSign ? "%+d" : "%d";
+    int ms = (int)(time % 1000) / 10; // actually centiseconds...
+    int sec = (int)(time / 1000 % 60);
+    int min = (int)(time / 60000 % 60);
+    int hours = (int)(time / 3600000);
+    if (Math.abs(time) < 60000) {
+      first = (forceSign && time > 0) ? "+" : "";
+      return String.format( first + "%d.%02d", sec, Math.abs(ms));
+    } else if (Math.abs(time) < 3600000) {
+      return String.format(first + ":%02d.%02d", min, Math.abs(sec), 
+        Math.abs(ms));
+    } else {
+      return String.format(first + "%2d:%02d.%02d", hours, Math.abs(min), 
+          Math.abs(sec), Math.abs(ms));
+    }
   }
 
   public void update() {

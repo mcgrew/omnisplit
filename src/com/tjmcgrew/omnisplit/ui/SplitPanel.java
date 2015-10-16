@@ -49,10 +49,17 @@ public class SplitPanel extends JPanel implements SplitListener {
 
   public void splitEvent(SplitEvent evt) {
     SplitEvent.Type type = evt.getType();
+    SplitTime time = evt.getSource();
     switch(type) {
       case UPDATE:
+        if (time.getBestTime() / 5 * 4 >= time.getTime()) {
+          if (!time.isEnded())
+            this.currentLabel.setText("");
+          break;
+        }
       case END:
-        this.currentLabel.setText(String.format("%d", evt.getSource().getTime()/1000));
+        this.currentLabel.setText(SplitTime.formatTime(
+          time.getTime() - time.getBestTime(), true));
         break;
     }
   }

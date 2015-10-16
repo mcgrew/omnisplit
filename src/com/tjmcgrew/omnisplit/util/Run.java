@@ -113,23 +113,36 @@ public class Run extends SplitTime implements DaemonListener {
   /**
    * Starts a new timed run.
    */
-  public void start() {
-		super.start();
+  public boolean start() {
+		boolean returnvalue = super.start();
     this.currentSplit = 0;
-    this.splits.get(this.currentSplit).start();
+    this.splits.get(0).start();
+    for (SplitTime s : this.splits) {
+      s.setRunStart(this.startTime);
+    }
+    return returnvalue;
   }
 
   /**
    * Pauses the current run.
    */
-  public void pause() {
-		super.pause();
+  public boolean pause() {
+		boolean returnvalue = super.pause();
     this.splits.get(this.currentSplit).pause();
+    return returnvalue;
   }
 
-  public void resume() {
-    super.resume();
+  public boolean resume() {
+    long shiftAmount = System.currentTimeMillis() - this.pauseTime;
+		if (this.isPaused()) {
+			this.shift(shiftAmount);
+      for (SplitTime s : this.splits) {
+        s.shift(shiftAmount);
+      }
+		}
+    boolean returnvalue = super.resume();
     this.splits.get(this.currentSplit).resume();
+    return returnvalue;
   }
 
   /**
