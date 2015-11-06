@@ -150,7 +150,7 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public void next() {
     this.splits.get(this.currentSplit).end();
-		if (this.currentSplit < this.splits.size()) {
+		if (this.currentSplit < this.splits.size() -1) {
 			this.currentSplit++;
 			this.splits.get(this.currentSplit).start();
 		} else {

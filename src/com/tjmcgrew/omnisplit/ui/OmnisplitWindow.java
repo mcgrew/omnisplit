@@ -52,11 +52,11 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
     this.setLayout(new BorderLayout());
     // temporary stuff
     List<SplitTime> splits = new ArrayList();
-    splits.add(new SplitTime("Stage 1",  6000, 6000));
-    splits.add(new SplitTime("Stage 2", 12000, 6000));
-    splits.add(new SplitTime("Stage 3", 18000, 6000));
-    splits.add(new SplitTime("Stage 4", 24000, 6000));
-    splits.add(new SplitTime("Stage 5", 30000, 6000));
+    splits.add(new SplitTime("Stage 1",  10000, 10000));
+    splits.add(new SplitTime("Stage 2",  20000, 10000));
+    splits.add(new SplitTime("Stage 3",  30000, 10000));
+    splits.add(new SplitTime("Stage 4",  40000, 10000));
+    splits.add(new SplitTime("Stage 5",  50000, 10000));
     // end temporary stuff
     this.runPanel = new RunPanel(new Run("Cheetahmen II", splits));
     this.add(this.runPanel, BorderLayout.CENTER);
