@@ -149,8 +149,11 @@ public class Run extends SplitTime implements DaemonListener {
    * Advances to the next split.
    */
   public void next() {
+		if (this.isEnded()) {
+			return;
+		}
     this.splits.get(this.currentSplit).end();
-		if (this.currentSplit < this.splits.size() -1) {
+		if (this.currentSplit < this.splits.size()-1) {
 			this.currentSplit++;
 			this.splits.get(this.currentSplit).start();
 		} else {
@@ -174,7 +177,9 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public void update() {
 		super.update();
-    this.updater.update(this);
     this.splits.get(this.currentSplit).update();
+		if (!this.isEnded()) {
+			this.updater.update(this);
+		}
   }
 }
