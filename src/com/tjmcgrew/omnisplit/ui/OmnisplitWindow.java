@@ -3,6 +3,7 @@ package com.tjmcgrew.omnisplit.ui;
 import edu.purdue.bbc.util.Language;
 import edu.purdue.bbc.util.Settings;
 import edu.purdue.bbc.util.ProcessUtils;
+import edu.purdue.bbc.ui.ContextMenu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,9 +18,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.json.*;
@@ -45,6 +48,7 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   private int oldMouseX, oldMouseY;
   private RunPanel runPanel;
   public static Color background = new Color(30, 30, 30);
+  public ContextMenu menu;
 
   /**
    * Creates a new split window.
@@ -53,16 +57,6 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
     super("Omnisplit");
     this.setUndecorated(true);
     this.setLayout(new BorderLayout());
-    // temporary stuff
-    List<SplitTime> splits = new ArrayList();
-    splits.add(new SplitTime("Stage 1",  10000, 10000));
-    splits.add(new SplitTime("Stage 2",  20000, 10000));
-    splits.add(new SplitTime("Stage 3",  30000, 10000));
-    splits.add(new SplitTime("Stage 4",  40000, 10000));
-    splits.add(new SplitTime("Stage 5",  50000, 10000));
-    // end temporary stuff
-    this.runPanel = new RunPanel(new Run("Cheetahmen II", splits));
-    this.add(this.runPanel, BorderLayout.CENTER);
 
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
@@ -136,6 +130,34 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   }
 
   public void openFile() {
+  }
+
+  public void openJsonFile(File file) {
+    JsonReader reader;
+    JsonObject object;
+    try {
+      reader = Json.createReader(new FileReader(file));
+      object = reader.readObject();
+    } catch(FileNotFoundException e) {
+      // Todo: log an error and report to the user...
+      return;
+    }
+    reader.close();
+    List<SplitTime> splits = new ArrayList();
+    JsonArray jsonSplits = object.getJsonArray("splits");
+    for (JsonValue jsonSplit : jsonSplits) {
+      JsonObject j = (JsonObject)jsonSplit;
+      long bestTime = parseTime(j.getJsonString("best_time").getString());
+      long bestSegment = parseTime(j.getJsonString("best_segment").getString());
+      splits.add(new SplitTime(j.getJsonString("title").getString(), 
+          bestTime, bestSegment));
+    }
+    this.runPanel = new RunPanel(new Run(
+        object.getJsonString("title").getString(), splits));
+    this.add(this.runPanel, BorderLayout.CENTER);
+  }
+
+  public void openWSplitFile(File file) {
   }
 
   public static OmnisplitWindow newWindow() {
@@ -232,6 +254,11 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
 				return button;
 		}
 	}
+
+  private long parseTime(String time) {
+    // not yet implemented
+    return 0;
+  }
 
 }
 
