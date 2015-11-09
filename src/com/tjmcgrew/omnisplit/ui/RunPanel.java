@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import com.tjmcgrew.omnisplit.ui.SplitPanel;
 import com.tjmcgrew.omnisplit.util.SplitEvent;
@@ -19,8 +20,7 @@ public class RunPanel extends JPanel implements SplitListener {
   private JPanel splitsPanel;
   private List splits = new ArrayList<SplitPanel>();
   private MainTimerPanel mainTimerPanel;
-  private SplitPanel bestPanel;
-  private SplitPanel sobPanel;
+  private SplitPanel bestPanel; private SplitPanel sobPanel;
   private Run run;
 
   public RunPanel (Run run) {
@@ -30,16 +30,23 @@ public class RunPanel extends JPanel implements SplitListener {
     this.sobPanel = new SplitPanel(new SplitTime("Previous Best", 30000, Long.MIN_VALUE));
     this.mainTimerPanel = new MainTimerPanel();
     this.mainTimerPanel.setOpaque(true);
-    this.mainTimerPanel.setBackground(new Color(30, 30, 30));
+    this.mainTimerPanel.setBackground(OmnisplitWindow.background);
     this.splitsPanel = new JPanel(new GridLayout(0, 1));
     JPanel bottomPanel = new JPanel(new GridLayout(0, 1));
     JPanel centerPanel = new JPanel(new BorderLayout());
+    JPanel topPanel = new JPanel(new BorderLayout());
 
-    JLabel spacerLabel = new JLabel("");
-    spacerLabel.setOpaque(true);
-    spacerLabel.setBackground(new Color(30, 30, 30));
-    centerPanel.add(spacerLabel, BorderLayout.CENTER);
-    centerPanel.add(mainTimerPanel, BorderLayout.SOUTH);
+    JPanel spacerPanel = new JPanel();
+    spacerPanel.setOpaque(true);
+    spacerPanel.setBackground(OmnisplitWindow.background);
+    centerPanel.add(this.splitsPanel, BorderLayout.NORTH);
+    centerPanel.add(spacerPanel, BorderLayout.CENTER);
+    JScrollPane scrollPane = new JScrollPane(centerPanel);
+    scrollPane.setBorder(null);
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    topPanel.add(scrollPane, BorderLayout.CENTER);
+    topPanel.add(mainTimerPanel, BorderLayout.SOUTH);
 
     bottomPanel.add(this.bestPanel);
     bottomPanel.add(this.sobPanel);
@@ -48,8 +55,9 @@ public class RunPanel extends JPanel implements SplitListener {
       this.splitsPanel.add(new SplitPanel(s));
     }
 
-    this.add(this.splitsPanel, BorderLayout.NORTH);
-    this.add(centerPanel, BorderLayout.CENTER);
+//    this.add(this.splitsPanel, BorderLayout.NORTH);
+//    this.add(centerPanel, BorderLayout.CENTER);
+    this.add(topPanel, BorderLayout.CENTER);
     this.add(bottomPanel, BorderLayout.SOUTH);
     run.addListener(this);
   }
@@ -82,14 +90,14 @@ public class RunPanel extends JPanel implements SplitListener {
       this.secLabel.setHorizontalAlignment(JLabel.RIGHT);
       this.secLabel.setVerticalAlignment(JLabel.BOTTOM);
       this.secLabel.setOpaque(true);
-      this.secLabel.setBackground(new Color(30, 30, 30));
+      this.secLabel.setBackground(OmnisplitWindow.background);
       this.secLabel.setForeground(Color.WHITE);
 
       this.msecLabel.setFont(new Font(font.getName(), Font.BOLD, 24));
       this.msecLabel.setHorizontalAlignment(JLabel.RIGHT);
       this.msecLabel.setVerticalAlignment(JLabel.BOTTOM);
       this.msecLabel.setOpaque(true);
-      this.msecLabel.setBackground(new Color(30, 30, 30));
+      this.msecLabel.setBackground(OmnisplitWindow.background);
       this.msecLabel.setForeground(Color.WHITE);
 
       this.add(this.msecLabel, BorderLayout.EAST);

@@ -5,6 +5,7 @@ import edu.purdue.bbc.util.Settings;
 import edu.purdue.bbc.util.ProcessUtils;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -43,6 +44,7 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
 
   private int oldMouseX, oldMouseY;
   private RunPanel runPanel;
+  public static Color background = new Color(30, 30, 30);
 
   /**
    * Creates a new split window.

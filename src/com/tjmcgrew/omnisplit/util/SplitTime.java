@@ -124,6 +124,19 @@ public class SplitTime {
   }
 
   /**
+   * Gets the time for this split from the beginning of the run.
+   * 
+   * @return The time for this split.
+   */
+  public long getRunTime() {
+    if (this.isEnded()) {
+      return this.endTime - this.runStartTime;
+    } else {
+      return System.currentTimeMillis() - this.runStartTime;
+    }
+  }
+
+  /**
    * Shifts all previously set times by this amount (for pause compensation).
    * 
    * @param amount The number of milliseconds to shift by.
