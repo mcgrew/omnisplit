@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +30,7 @@ import javax.json.*;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
@@ -37,6 +39,7 @@ import javax.swing.event.MouseInputListener;
 import com.tjmcgrew.omnisplit.util.Run;
 import com.tjmcgrew.omnisplit.util.SplitTime;
 import com.tjmcgrew.omnisplit.ui.RunPanel;
+import com.tjmcgrew.omnisplit.io.SplitFile;
 import org.apache.log4j.Logger;
 
 /**
@@ -130,34 +133,27 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   }
 
   public void openFile() {
-  }
-
-  public void openJsonFile(File file) {
-    JsonReader reader;
-    JsonObject object;
-    try {
-      reader = Json.createReader(new FileReader(file));
-      object = reader.readObject();
-    } catch(FileNotFoundException e) {
-      // Todo: log an error and report to the user...
-      return;
-    }
-    reader.close();
-    List<SplitTime> splits = new ArrayList();
-    JsonArray jsonSplits = object.getJsonArray("splits");
-    for (JsonValue jsonSplit : jsonSplits) {
-      JsonObject j = (JsonObject)jsonSplit;
-      long bestTime = parseTime(j.getJsonString("best_time").getString());
-      long bestSegment = parseTime(j.getJsonString("best_segment").getString());
-      splits.add(new SplitTime(j.getJsonString("title").getString(), 
-          bestTime, bestSegment));
-    }
-    this.runPanel = new RunPanel(new Run(
-        object.getJsonString("title").getString(), splits));
-    this.add(this.runPanel, BorderLayout.CENTER);
-  }
-
-  public void openWSplitFile(File file) {
+		String lastOpenCSV = Settings.getSettings( ).getProperty( 
+			"history.open.last" );
+		JFileChooser fc;
+		if ( lastOpenCSV != null ) {
+			fc = new JFileChooser( 
+				new File( lastOpenCSV ).getParentFile( ));
+		} else {
+			fc = new JFileChooser( );
+		}
+		fc.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
+//		fc.addChoosableFileFilter( new MetsignFileFilter( ));
+		int options = fc.showOpenDialog( this );
+		if ( options == JFileChooser.APPROVE_OPTION ) {
+//			FileFilter fileFilter = fc.getFileFilter( );
+			File selected = fc.getSelectedFile( );
+//			Settings.getSettings( ).setProperty( "history.open.last", 
+//				selected.getAbsolutePath( ));
+			Run run = SplitFile.openJsonFile(selected);
+			this.runPanel = new RunPanel(run);
+			this.add(this.runPanel, BorderLayout.CENTER);
+		}
   }
 
   public static OmnisplitWindow newWindow() {
@@ -254,11 +250,6 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
 				return button;
 		}
 	}
-
-  private long parseTime(String time) {
-    // not yet implemented
-    return 0;
-  }
 
 }
 
