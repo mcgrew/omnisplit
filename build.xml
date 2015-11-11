@@ -128,7 +128,6 @@
                      includeantruntime="false">
                 <classpath>
                     <pathelement location="tests/junit-4.11.jar"/>
-                    <pathelement location="tests/jsc.jar"/>
                     <pathelement path="${class_dir}"/>
                     <fileset dir="${lib_dir}">
                         <include name="**/*.jar"/>
