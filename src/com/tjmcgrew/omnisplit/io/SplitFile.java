@@ -34,12 +34,16 @@ public class SplitFile {
     JsonArray jsonSplits = object.getJsonArray("splits");
     for (JsonValue jsonSplit : jsonSplits) {
       JsonObject j = (JsonObject)jsonSplit;
+      long runTime = parseTime(j.getJsonString("time").getString());
       long bestTime = parseTime(j.getJsonString("best_time").getString());
       long bestSegment = parseTime(j.getJsonString("best_segment").getString());
       splits.add(new SplitTime(j.getJsonString("title").getString(), 
-          bestTime, bestSegment));
+          runTime, bestSegment, bestTime));
     }
-		return new Run( object.getJsonString("title").getString(), splits);
+		Run run = new Run( object.getJsonString("title").getString(), splits);
+    run.setWidth(object.getInt("width"));
+    run.setHeight(object.getInt("height"));
+    return run;
   }
 
   public static Run openWSplitFile(String file) {

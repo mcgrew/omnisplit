@@ -1,4 +1,9 @@
+
 import com.tjmcgrew.omnisplit.io.SplitFile;
+import com.tjmcgrew.omnisplit.util.Run;
+import com.tjmcgrew.omnisplit.util.SplitTime;
+
+import java.util.List;
 
 import junit.framework.*;
 
@@ -29,5 +34,45 @@ public class TestSplitFile extends TestCase {
       }
       assertEquals(value, SplitFile.parseTime(timestamp));
     }
+  }
+
+  public void testOpenJsonFile() {
+    Run run = SplitFile.openJsonFile("tests/test.json");
+    assertEquals("SotN Any% NSC", run.getName());
+    assertEquals(300, run.getHeight());
+    assertEquals(320, run.getWidth());
+//    assertEquals(71, run.getAttemptCount());
+//    assertEquals(2800, run.getStartDelay());
+    List<SplitTime> splits = run.getSplits();
+    SplitTime s = splits.get(0);
+    assertEquals("Mist", s.getName());
+    assertEquals(692100, s.getBestTime());
+    assertEquals(701299, s.getBestRunTime());
+    assertEquals(692100, s.getBestSegment());
+    s = splits.get(1);
+    assertEquals("Bat", s.getName());
+    assertEquals(876934, s.getBestRunTime());
+    assertEquals(856933, s.getBestTime());
+    assertEquals(155819, s.getBestSegment());
+    s = splits.get(2);
+    assertEquals("Reverse", s.getName());
+    assertEquals(1071600, s.getBestRunTime());
+    assertEquals(1046241, s.getBestTime());
+    assertEquals(188843, s.getBestSegment());
+    s = splits.get(3);
+    assertEquals("Dracula", s.getName());
+    assertEquals(1432151, s.getBestRunTime());
+    assertEquals(1432151, s.getBestTime());
+    assertEquals(354446, s.getBestSegment());
+  }
+
+  public void testWriteJsonFile() {
+  }
+
+  public void testOpenWSplitFile() {
+//    Run run = SplitFile.openWSplitFile("tests/test.wsplit");
+  }
+
+  public void testWriteWSplitFile() {
   }
 }

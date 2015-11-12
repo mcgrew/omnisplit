@@ -8,6 +8,7 @@ public class SplitTime {
   protected String name;
   protected long bestSegment;
   protected long bestTime;
+  protected long bestRunTime;
   protected long endTime;
   protected long pauseTime;
   protected long startTime;
@@ -18,7 +19,7 @@ public class SplitTime {
    * Creates a new SplitTime with no defined times.
    */
   public SplitTime(String name) {
-    this( name, Long.MIN_VALUE, Long.MIN_VALUE);
+    this(name, Long.MIN_VALUE, Long.MIN_VALUE, Long.MIN_VALUE);
   }
 
   /**
@@ -27,8 +28,18 @@ public class SplitTime {
    * @param bestTime The current best time in milliseconds from the beginning of
    *  the run.
    */
-  public SplitTime(String name, long bestTime) {
-    this(name, bestTime, Long.MIN_VALUE);
+  public SplitTime(String name, long bestRunTime) {
+    this(name, bestRunTime, Long.MIN_VALUE, Long.MIN_VALUE);
+  }
+
+  /**
+   * Creates a new SplitTime with the given best time.
+   * 
+   * @param bestTime The current best time in milliseconds from the beginning of
+   *  the run.
+   */
+  public SplitTime(String name, long bestRunTime, long bestSegment) {
+    this(name, bestRunTime, bestSegment, Long.MIN_VALUE);
   }
 
   /**
@@ -39,8 +50,9 @@ public class SplitTime {
    * @param bestSegment The current best time in milliseconds for this segment 
    *  of the run.
    */
-  public SplitTime(String name, long bestTime, long bestSegment) {
+  public SplitTime(String name, long bestRunTime, long bestSegment, long bestTime) {
     this.name = name;
+    this.bestRunTime = bestRunTime;
     this.bestTime = bestTime;
     this.bestSegment = bestSegment;
     this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
@@ -59,6 +71,14 @@ public class SplitTime {
 
   public long getBestTime() {
     return this.bestTime;
+  }
+
+  public void setBestRunTime(long time) {
+    this.bestRunTime = time;
+  }
+
+  public long getBestRunTime() {
+    return this.bestRunTime;
   }
 
   /**

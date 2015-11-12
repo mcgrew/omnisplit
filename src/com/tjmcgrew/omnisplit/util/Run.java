@@ -11,6 +11,7 @@ public class Run extends SplitTime implements DaemonListener {
   private List<SplitTime> splits;
   private int currentSplit;
   private UpdateDaemon updater;
+  private int width, height;
 
   /**
    * Creates a new empty run.
@@ -181,5 +182,21 @@ public class Run extends SplitTime implements DaemonListener {
 		if (!this.isEnded()) {
 			this.updater.update(this);
 		}
+  }
+
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public int getWidth() {
+    return this.width;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+  public int getHeight() {
+    return this.height;
   }
 }
