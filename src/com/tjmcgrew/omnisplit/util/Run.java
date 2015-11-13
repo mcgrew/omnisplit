@@ -14,6 +14,7 @@ public class Run extends SplitTime implements DaemonListener {
   private int width, height;
   private int attemptCount;
   private long startDelay;
+  private String filename;
 
   /**
    * Creates a new empty run.
@@ -91,9 +92,6 @@ public class Run extends SplitTime implements DaemonListener {
     this.attemptCount = 0;
     this.startDelay = 0L;
     this.splits = splits;
-    this.updater = UpdateDaemon.create(100);
-    this.updater.update(this);
-    this.updater.start();
   }
 
   /**
@@ -119,6 +117,11 @@ public class Run extends SplitTime implements DaemonListener {
    * Starts a new timed run.
    */
   public boolean start() {
+    if (this.updater == null) {
+      this.updater = UpdateDaemon.create(100);
+      this.updater.update(this);
+      this.updater.start();
+    }
 		boolean returnvalue = super.start();
     this.currentSplit = 0;
     this.splits.get(0).start();
@@ -258,5 +261,23 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public long getStartDelay() {
     return this.startDelay;
+  }
+
+  /**
+   * Sets the filename for this run.
+   * 
+   * @param filename The file to use when saving.
+   */
+  public void setFilename(String filename) {
+    this.filename = filename;
+  }
+
+  /**
+   * Gets the filename for this run.
+   * 
+   * @return The current filename for this run.
+   */
+  public String getFilename() {
+    return this.filename;
   }
 }

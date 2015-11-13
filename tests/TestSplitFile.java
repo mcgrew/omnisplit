@@ -28,7 +28,6 @@ public class TestSplitFile extends TestCase {
             value / 1000 % 60,
             value % 1000);
       }
-//      System.out.println(timestamp);
       if (Math.random() > 0.5) {
         timestamp += 543; //randomly append extra digits
       }
@@ -71,7 +70,58 @@ public class TestSplitFile extends TestCase {
   }
 
   public void testOpenWSplitFile() {
-//    Run run = SplitFile.openWSplitFile("tests/test.wsplit");
+    Run run = SplitFile.openWSplitFile("tests/test.wsplit");
+    assertEquals("Zelda", run.getName());
+    assertEquals(120, run.getHeight());
+    assertEquals(25, run.getWidth());
+    assertEquals(103, run.getAttemptCount());
+    assertEquals(1000, run.getStartDelay());
+    List<SplitTime> splits = run.getSplits();
+    SplitTime s = splits.get(0);
+    assertEquals("2", s.getName());
+    assertEquals(146450, s.getBestTime());
+    assertEquals(146450, s.getBestRunTime());
+    assertEquals(139380, s.getBestSegment());
+    s = splits.get(1);
+    assertEquals("3", s.getName());
+    assertEquals(468030, s.getBestTime());
+    assertEquals(468030, s.getBestRunTime());
+    assertEquals(321580, s.getBestSegment());
+    s = splits.get(2);
+    assertEquals("4", s.getName());
+    assertEquals(690120, s.getBestTime());
+    assertEquals(690120, s.getBestRunTime());
+    assertEquals(221150, s.getBestSegment());
+    s = splits.get(3);
+    assertEquals("1", s.getName());
+    assertEquals(869670, s.getBestTime());
+    assertEquals(869670, s.getBestRunTime());
+    assertEquals(177130, s.getBestSegment());
+    s = splits.get(4);
+    assertEquals("5", s.getName());
+    assertEquals(1233770, s.getBestTime());
+    assertEquals(1233770, s.getBestRunTime());
+    assertEquals(327340, s.getBestSegment());
+    s = splits.get(5);
+    assertEquals("7", s.getName());
+    assertEquals(1458020, s.getBestTime());
+    assertEquals(1458020, s.getBestRunTime());
+    assertEquals(224250, s.getBestSegment());
+    s = splits.get(6);
+    assertEquals("6", s.getName());
+    assertEquals(1656590, s.getBestTime());
+    assertEquals(1656590, s.getBestRunTime());
+    assertEquals(186650, s.getBestSegment());
+    s = splits.get(7);
+    assertEquals("8", s.getName());
+    assertEquals(1789870, s.getBestTime());
+    assertEquals(1789870, s.getBestRunTime());
+    assertEquals(128670, s.getBestSegment());
+    s = splits.get(8);
+    assertEquals("Bacon", s.getName());
+    assertEquals(2145750, s.getBestTime());
+    assertEquals(2145750, s.getBestRunTime());
+    assertEquals(3460, s.getBestSegment());
   }
 
   public void testWriteWSplitFile() {

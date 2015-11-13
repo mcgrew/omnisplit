@@ -3,6 +3,9 @@ package com.tjmcgrew.omnisplit.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class for holding a single split time.
+ */
 public class SplitTime {
 
   protected String name;
@@ -177,9 +180,18 @@ public class SplitTime {
    * Starts this split.
    */
   public boolean start() {
-    this.startTime = System.currentTimeMillis();
+    return this.start(0L);
+  }
+
+  /**
+   * Starts this split.
+   * 
+   * @param delay The preset delay before starting the run.
+   */
+  public boolean start(long delay) {
+    this.startTime = System.currentTimeMillis() + delay;
     if (this.runStartTime == Long.MIN_VALUE)
-      this.runStartTime = System.currentTimeMillis();
+      this.runStartTime = System.currentTimeMillis() + delay;
     this.fireEvent(new SplitEvent(SplitEvent.Type.START, this));
     return true;
   }

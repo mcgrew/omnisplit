@@ -11,6 +11,14 @@ import com.tjmcgrew.omnisplit.util.*;
 
 /**
  * A class for displaying a single split time.
+ *
+ * Colors: 
+ *  red = Lost time on this segment and behind.
+ *  light red = gained time on that segment, but still behind.
+ *  light green = lost time on this segment, but still ahead.
+ *  green = gained time on that segment, and ahead.
+ *  gold = new best segment time.
+ * 
  */
 public class SplitPanel extends JPanel implements SplitListener {
   private SplitTime split;
