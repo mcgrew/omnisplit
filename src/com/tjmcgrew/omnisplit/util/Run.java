@@ -12,6 +12,8 @@ public class Run extends SplitTime implements DaemonListener {
   private int currentSplit;
   private UpdateDaemon updater;
   private int width, height;
+  private int attemptCount;
+  private long startDelay;
 
   /**
    * Creates a new empty run.
@@ -86,6 +88,8 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public Run(String name, List splits, long pb) {
 		super(name, pb, Long.MIN_VALUE);
+    this.attemptCount = 0;
+    this.startDelay = 0L;
     this.splits = splits;
     this.updater = UpdateDaemon.create(100);
     this.updater.update(this);
@@ -184,19 +188,75 @@ public class Run extends SplitTime implements DaemonListener {
 		}
   }
 
+  /**
+   * Changes the window width setting for this run.
+   * 
+   * @param width The new width setting.
+   */
   public void setWidth(int width) {
     this.width = width;
   }
 
+  /**
+   * Gets the current width setting for this run.
+   * 
+   * @return The current width setting.
+   */
   public int getWidth() {
     return this.width;
   }
 
+  /**
+   * Changes the current height setting for this run.
+   * 
+   * @param height The new height setting.
+   */
   public void setHeight(int height) {
     this.height = height;
   }
 
+  /**
+   * Gets the current height setting for this run.
+   * 
+   * @return The current height setting.
+   */
   public int getHeight() {
     return this.height;
+  }
+
+  /**
+   * Changes the attempt count.
+   * 
+   * @param count The new attempt count.
+   */
+  public void setAttemptCount(int count) {
+    this.attemptCount = count;
+  }
+
+  /**
+   * Gets the current attempt count.
+   * 
+   * @return The current attempt count.
+   */
+  public int getAttemptCount() {
+    return this.attemptCount;
+  }
+
+  /**
+   * Sets the start delay for this run in milliseconds.
+   * 
+   * @param delay The start delay.
+   */
+  public void setStartDelay(long delay) {
+    this.startDelay = delay;
+  }
+
+  /**
+   * Gets the start delay in milliseconds.
+   * 
+   * @return The start delay.
+   */
+  public long getStartDelay() {
+    return this.startDelay;
   }
 }

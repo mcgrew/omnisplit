@@ -33,16 +33,20 @@ public class SplitFile {
     List<SplitTime> splits = new ArrayList();
     JsonArray jsonSplits = object.getJsonArray("splits");
     for (JsonValue jsonSplit : jsonSplits) {
-      JsonObject j = (JsonObject)jsonSplit;
-      long runTime = parseTime(j.getJsonString("time").getString());
-      long bestTime = parseTime(j.getJsonString("best_time").getString());
-      long bestSegment = parseTime(j.getJsonString("best_segment").getString());
-      splits.add(new SplitTime(j.getJsonString("title").getString(), 
+      JsonObject split = (JsonObject)jsonSplit;
+      long runTime = parseTime(split.getJsonString("time").getString());
+      long bestTime = parseTime(split.getJsonString("best_time").getString());
+      long bestSegment = 
+          parseTime(split.getJsonString("best_segment").getString());
+      splits.add(new SplitTime(split.getJsonString("title").getString(), 
           runTime, bestSegment, bestTime));
     }
 		Run run = new Run( object.getJsonString("title").getString(), splits);
     run.setWidth(object.getInt("width"));
     run.setHeight(object.getInt("height"));
+    run.setAttemptCount(object.getInt("attempt_count"));
+    run.setStartDelay(parseTime(
+        object.getJsonString("start_delay").getString()));
     return run;
   }
 
@@ -60,24 +64,21 @@ public class SplitFile {
     Matcher m = null;
     long hours, minutes, seconds, msec;
     try {
-      p = Pattern.compile("(?:(\\d+)\\:)?(\\d+)\\:(\\d{2}).(\\d{3})");
+      p = Pattern.compile("(?:(?:(\\d+)\\:)?(\\d+)\\:)?(\\d+).(\\d{3})");
       m = p.matcher(time);
       m.find();
       String hourString = m.group(1);
-      if (hourString != null) {
-        hours = Long.parseLong(hourString);
-      } else {
-        hours = 0L;
-      }
-      minutes = Long.parseLong(m.group(2));
+      String minuteString = m.group(2);
+      hours = (hourString != null) ? Long.parseLong(hourString) : 0L;
+      minutes = (minuteString != null) ? Long.parseLong(minuteString) : 0L;
       seconds = Long.parseLong(m.group(3));
       msec = Long.parseLong(m.group(4));
       return msec + seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
     } catch (IllegalStateException e) {
-//      System.out.printf("Pattern: %s\n", p.toString());
-//      System.out.printf("Input:   %s\n", time);
-//      System.out.printf("Matches: %s\n", m.matches());
-//      System.out.printf("Groups:  %d\n", m.groupCount());
+      System.out.printf("Pattern: %s\n", p.toString());
+      System.out.printf("Input:   %s\n", time);
+      System.out.printf("Matches: %s\n", m.matches());
+      System.out.printf("Groups:  %d\n", m.groupCount());
       System.out.println(e.getMessage());
     }
     return 0L;

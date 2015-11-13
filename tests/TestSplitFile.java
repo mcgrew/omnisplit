@@ -34,6 +34,7 @@ public class TestSplitFile extends TestCase {
       }
       assertEquals(value, SplitFile.parseTime(timestamp));
     }
+    assertEquals(2475, SplitFile.parseTime("2.475"));
   }
 
   public void testOpenJsonFile() {
@@ -41,8 +42,8 @@ public class TestSplitFile extends TestCase {
     assertEquals("SotN Any% NSC", run.getName());
     assertEquals(300, run.getHeight());
     assertEquals(320, run.getWidth());
-//    assertEquals(71, run.getAttemptCount());
-//    assertEquals(2800, run.getStartDelay());
+    assertEquals(71, run.getAttemptCount());
+    assertEquals(2800, run.getStartDelay());
     List<SplitTime> splits = run.getSplits();
     SplitTime s = splits.get(0);
     assertEquals("Mist", s.getName());
