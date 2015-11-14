@@ -13,7 +13,7 @@ public class Run extends SplitTime implements DaemonListener {
   private UpdateDaemon updater;
   private int width, height;
   private int attemptCount;
-  private long startDelay;
+  private Time startDelay;
   private String filename;
 
   /**
@@ -90,7 +90,7 @@ public class Run extends SplitTime implements DaemonListener {
   public Run(String name, List splits, long pb) {
 		super(name, pb, Long.MIN_VALUE);
     this.attemptCount = 0;
-    this.startDelay = 0L;
+    this.startDelay = new Time(0L);
     this.splits = splits;
   }
 
@@ -251,7 +251,7 @@ public class Run extends SplitTime implements DaemonListener {
    * @param delay The start delay.
    */
   public void setStartDelay(long delay) {
-    this.startDelay = delay;
+    this.startDelay.setValue(delay);
   }
 
   /**
@@ -259,7 +259,7 @@ public class Run extends SplitTime implements DaemonListener {
    * 
    * @return The start delay.
    */
-  public long getStartDelay() {
+  public Time getStartDelay() {
     return this.startDelay;
   }
 

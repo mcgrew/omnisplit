@@ -9,9 +9,9 @@ import java.util.List;
 public class SplitTime {
 
   protected String name;
-  protected long bestSegment;
-  protected long bestTime;
-  protected long bestRunTime;
+  protected Time bestSegment;
+  protected Time bestTime;
+  protected Time bestRunTime;
   protected long endTime;
   protected long pauseTime;
   protected long startTime;
@@ -55,9 +55,9 @@ public class SplitTime {
    */
   public SplitTime(String name, long bestRunTime, long bestSegment, long bestTime) {
     this.name = name;
-    this.bestRunTime = bestRunTime;
-    this.bestTime = bestTime;
-    this.bestSegment = bestSegment;
+    this.bestRunTime = new Time(bestRunTime);
+    this.bestTime = new Time(bestTime);
+    this.bestSegment = new Time(bestSegment);
     this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
     this.runStartTime = Long.MIN_VALUE;
 		this.listeners = new ArrayList();
@@ -69,18 +69,18 @@ public class SplitTime {
    * @param time The new time from the start of the run.
    */
   public void setBestTime(long time) {
-    this.bestTime = time;
+    this.bestTime.setValue(time);
   }
 
-  public long getBestTime() {
+  public Time getBestTime() {
     return this.bestTime;
   }
 
   public void setBestRunTime(long time) {
-    this.bestRunTime = time;
+    this.bestRunTime.setValue(time);
   }
 
-  public long getBestRunTime() {
+  public Time getBestRunTime() {
     return this.bestRunTime;
   }
 
@@ -90,7 +90,7 @@ public class SplitTime {
    * @param time The new time from the start of the split
    */
   public void setBestSegment(long time) {
-    this.bestSegment = time;
+    this.bestSegment.setValue(time);
   }
 
   /**
@@ -98,7 +98,7 @@ public class SplitTime {
 	 * 
 	 * @return The current best segment.
 	 */
-  public long getBestSegment() {
+  public Time getBestSegment() {
     return this.bestSegment;
   }
 
@@ -307,35 +307,6 @@ public class SplitTime {
   private void fireEvent(SplitEvent evt) {
     for (SplitListener l:this.listeners) {
       l.splitEvent(evt);
-    }
-  }
-
-  public static String formatTime(long time) {
-    return formatTime(time, false);
-  }
-
-  /**
-   * Formats a timestamp as hh:mm:ss
-   * 
-   * @param time The time to format as a long
-   * @param forceSign force display of '+' for positive numbers
-   * @return A string containing the formatted time.
-   */
-  public static String formatTime(long time, boolean forceSign) {
-    String first = forceSign ? "%+d" : "%d";
-    int ms = (int)(time % 1000) / 10; // actually centiseconds...
-    int sec = (int)(time / 1000 % 60);
-    int min = (int)(time / 60000 % 60);
-    int hours = (int)(time / 3600000);
-    if (Math.abs(time) < 60000) {
-      first = (forceSign && time > 0) ? "+" : "";
-      return String.format( first + "%d.%02d", sec, Math.abs(ms));
-    } else if (Math.abs(time) < 3600000) {
-      return String.format(first + ":%02d.%02d", min, Math.abs(sec), 
-        Math.abs(ms));
-    } else {
-      return String.format(first + "%2d:%02d.%02d", hours, Math.abs(min), 
-          Math.abs(sec), Math.abs(ms));
     }
   }
 

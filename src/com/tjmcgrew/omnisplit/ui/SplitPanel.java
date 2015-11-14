@@ -43,7 +43,7 @@ public class SplitPanel extends JPanel implements SplitListener {
     this.currentLabel.setForeground(Color.WHITE);
     this.currentLabel.setBackground(new Color(30, 30, 30));
     this.currentLabel.setOpaque(true);
-    this.bestLabel = new JLabel(SplitTime.formatTime(split.getBestTime()));
+    this.bestLabel = new JLabel(split.getBestTime().toString());
     this.bestLabel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 10));
     this.bestLabel.setForeground(Color.WHITE);
     this.bestLabel.setBackground(new Color(30, 30, 30));
@@ -60,18 +60,18 @@ public class SplitPanel extends JPanel implements SplitListener {
     SplitTime time = evt.getSource();
     switch(type) {
       case UPDATE:
-        if (time.getBestTime() / 5 * 4 >= time.getTime()) {
+        if (time.getBestTime().getValue() / 5 * 4 >= time.getTime()) {
           if (!time.isEnded())
             this.currentLabel.setText("");
         } else {
-          this.currentLabel.setText(SplitTime.formatTime(
-            time.getTime() - time.getBestTime(), true));
+          this.currentLabel.setText(Time.formatTime(
+            time.getTime() - time.getBestTime().getValue(), true));
         }
         break;
       case END:
-        this.currentLabel.setText(SplitTime.formatTime(
-          time.getTime() - time.getBestTime(), true));
-        this.bestLabel.setText(SplitTime.formatTime(time.getRunTime()));
+        this.currentLabel.setText(Time.formatTime(
+          time.getTime() - time.getBestTime().getValue(), true));
+        this.bestLabel.setText(Time.formatTime(time.getRunTime()));
         break;
     }
   }

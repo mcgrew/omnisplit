@@ -2,6 +2,7 @@ package com.tjmcgrew.omnisplit.io;
 
 import com.tjmcgrew.omnisplit.util.Run;
 import com.tjmcgrew.omnisplit.util.SplitTime;
+import com.tjmcgrew.omnisplit.util.Time;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,10 +38,10 @@ public class SplitFile {
     JsonArray jsonSplits = object.getJsonArray("splits");
     for (JsonValue jsonSplit : jsonSplits) {
       JsonObject split = (JsonObject)jsonSplit;
-      long runTime = parseTime(split.getJsonString("time").getString());
-      long bestTime = parseTime(split.getJsonString("best_time").getString());
+      long runTime = Time.parseTime(split.getJsonString("time").getString());
+      long bestTime = Time.parseTime(split.getJsonString("best_time").getString());
       long bestSegment = 
-          parseTime(split.getJsonString("best_segment").getString());
+          Time.parseTime(split.getJsonString("best_segment").getString());
       splits.add(new SplitTime(split.getJsonString("title").getString(), 
           runTime, bestSegment, bestTime));
     }
@@ -48,7 +49,7 @@ public class SplitFile {
     run.setWidth(object.getInt("width"));
     run.setHeight(object.getInt("height"));
     run.setAttemptCount(object.getInt("attempt_count"));
-    run.setStartDelay(parseTime(
+    run.setStartDelay(Time.parseTime(
         object.getJsonString("start_delay").getString()));
     return run;
   }
@@ -109,32 +110,6 @@ public class SplitFile {
   public static void writeWSplitFile(Run run) {
     // not yet implemented
   }
-
-  public static long parseTime(String time) {
-    Pattern p = null;
-    Matcher m = null;
-    long hours, minutes, seconds, msec;
-    try {
-      p = Pattern.compile("(?:(?:(\\d+)\\:)?(\\d+)\\:)?(\\d+).(\\d{3})");
-      m = p.matcher(time);
-      m.find();
-      String hourString = m.group(1);
-      String minuteString = m.group(2);
-      hours = (hourString != null) ? Long.parseLong(hourString) : 0L;
-      minutes = (minuteString != null) ? Long.parseLong(minuteString) : 0L;
-      seconds = Long.parseLong(m.group(3));
-      msec = Long.parseLong(m.group(4));
-      return msec + seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
-    } catch (IllegalStateException e) {
-      System.out.printf("Pattern: %s\n", p.toString());
-      System.out.printf("Input:   %s\n", time);
-      System.out.printf("Matches: %s\n", m.matches());
-      System.out.printf("Groups:  %d\n", m.groupCount());
-      System.out.println(e.getMessage());
-    }
-    return 0L;
-  }
-
 
   private static String [] splitLine( String input, String delimiters, 
                                       boolean useQuotes ) {
