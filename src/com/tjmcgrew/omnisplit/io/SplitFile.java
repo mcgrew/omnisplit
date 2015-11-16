@@ -13,14 +13,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.json.*;
+import javax.json.stream.JsonGenerator;
 import javax.swing.filechooser.FileFilter;
 
 public class SplitFile {
 
   public static enum Type { JSON, WSPLIT }
+
+  public static void writeFile(Run run) {
+    Type type = run.getFiletype();
+    switch(type) {
+      case JSON:
+        writeJsonFile(run);
+        break;
+      case WSPLIT:
+        writeWSplitFile(run);
+        break;
+      default:
+        System.out.println("File type not defined. Save aborted");
+        break;
+    }
+  }
 
   public static Run openJsonFile(String file) {
 		return openJsonFile(new File(file));
@@ -59,20 +76,26 @@ public class SplitFile {
   }
 
   public static void writeJsonFile(Run run) {
+    JsonArrayBuilder jsonSplits = Json.createArrayBuilder();
     JsonObjectBuilder object = Json.createObjectBuilder()
-        .add("width", run.getWidth())
-        .add("height", run.getHeight())
+        .add("title", run.getName())
         .add("attempt_count", run.getAttemptCount())
         .add("start_delay", run.getStartDelay().toString());
     for (SplitTime s : run.getSplits()) {
-      object.add("splits", Json.createObjectBuilder()
+      jsonSplits.add(Json.createObjectBuilder()
                    .add("title", s.getName())
                    .add("time", s.getBestRunTime().toString())
                    .add("best_segment", s.getBestSegment().toString())
-                   .add("best_time", s.getBestTime().toString()));
+                   .add("best_time", s.getBestTime().toString()).build());
     }
+    object.add("splits", jsonSplits)
+          .add("width", run.getWidth())
+          .add("height", run.getHeight());
     try {
-      JsonWriter writer = Json.createWriter(new FileWriter(run.getFilename()));
+      HashMap<String,Object> config = new HashMap();
+      config.put(JsonGenerator.PRETTY_PRINTING, true);
+      JsonWriter writer = Json.createWriterFactory(config)
+          .createWriter(new FileWriter(run.getFilename()));
       writer.writeObject(object.build());
       writer.close();
       run.clearModified();
@@ -120,7 +143,7 @@ public class SplitFile {
     run.setWidth(Integer.parseInt(size[1]));
     run.setAttemptCount(Integer.parseInt(valueMap.get("Attempts")));
     run.setStartDelay(
-        (long)Math.round((Double.parseDouble(valueMap.get("Offset")) * 1000)));
+        (long)Math.round(Double.parseDouble(valueMap.get("Offset")) * 1000));
     // not supported yet.
 //    String[] icons = splitLine(valueMap.get("Icons"), ",", true);
 //    for (int i=0; i < icons.length; i++) {
@@ -136,14 +159,16 @@ public class SplitFile {
       FileWriter writer = new FileWriter(new File(run.getFilename()));
       writer.write(String.format("Title=%s\n", run.getName()));
       writer.write(String.format("Attempts=%d\n", run.getAttemptCount()));
-      writer.write(String.format("Offset=%d\n", run.getStartDelay()));
+      writer.write(String.format("Offset=%.3f\n", 
+            ((double)run.getStartDelay().getValue())/1000));
       writer.write(String.format("Size=%d,%d\n", 
           run.getHeight(),run.getWidth()));
       StringBuilder icons = new StringBuilder("Icons=");
       for (SplitTime s : run.getSplits()) {
         // I'm not sure what the second number is supposed to be...
-        writer.write(String.format("%s,0,%s,%s\n", s.getName(), 
-          s.getBestRunTime().toString(), s.getBestSegment().toString()));
+        writer.write(String.format("%s,0,%.3f,%.3f\n", s.getName(), 
+                ((double)s.getBestRunTime().getValue())/1000, 
+                ((double)s.getBestSegment().getValue())/1000));
         // Icons aren't supported yet...
         icons.append(String.format("\"%s\",", s.getIcon()));
       }

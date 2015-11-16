@@ -176,16 +176,15 @@ public class Time {
     Matcher m = null;
     long hours, minutes, seconds, msec;
     try {
-      p = Pattern.compile("(?:(?:(\\d+)\\:)?(\\d+)\\:)?(\\d+).(\\d{3})");
+      p = Pattern.compile("(?:(?:(\\d+)\\:)?(\\d+)\\:)?(\\d+(?:\\.(\\d+)))?");
       m = p.matcher(time);
       m.find();
       String hourString = m.group(1);
       String minuteString = m.group(2);
       hours = (hourString != null) ? Long.parseLong(hourString) : 0L;
       minutes = (minuteString != null) ? Long.parseLong(minuteString) : 0L;
-      seconds = Long.parseLong(m.group(3));
-      msec = Long.parseLong(m.group(4));
-      return msec + seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
+      msec = (long)(Double.parseDouble(m.group(3))*1000);
+      return msec + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
     } catch (IllegalStateException e) {
       System.out.printf("Pattern: %s\n", p.toString());
       System.out.printf("Input:   %s\n", time);
