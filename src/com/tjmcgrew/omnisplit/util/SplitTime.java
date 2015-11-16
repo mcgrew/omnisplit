@@ -17,6 +17,8 @@ public class SplitTime {
   protected long startTime;
   protected long runStartTime;
   protected List <SplitListener> listeners;
+  protected String icon;
+  protected boolean modified;
 
   /**
    * Creates a new SplitTime with no defined times.
@@ -61,6 +63,8 @@ public class SplitTime {
     this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
     this.runStartTime = Long.MIN_VALUE;
 		this.listeners = new ArrayList();
+    this.icon = "";
+    this.modified = false;
   }
 
   /**
@@ -69,7 +73,10 @@ public class SplitTime {
    * @param time The new time from the start of the run.
    */
   public void setBestTime(long time) {
-    this.bestTime.setValue(time);
+    if (time != this.bestTime.getValue()) {
+      this.modified = true;
+      this.bestTime.setValue(time);
+    }
   }
 
   public Time getBestTime() {
@@ -77,7 +84,10 @@ public class SplitTime {
   }
 
   public void setBestRunTime(long time) {
-    this.bestRunTime.setValue(time);
+    if (time != this.bestRunTime.getValue()) {
+      this.modified = true;
+      this.bestRunTime.setValue(time);
+    }
   }
 
   public Time getBestRunTime() {
@@ -90,7 +100,10 @@ public class SplitTime {
    * @param time The new time from the start of the split
    */
   public void setBestSegment(long time) {
-    this.bestSegment.setValue(time);
+    if (time != this.bestSegment.getValue()) {
+      this.modified = true;
+      this.bestSegment.setValue(time);
+    }
   }
 
   /**
@@ -108,7 +121,10 @@ public class SplitTime {
    * @param name The new name.
    */
   public void setName(String name) {
-    this.name = name;
+    if (!name.equals(this.name)) {
+      this.modified = true;
+      this.name = name;
+    }
   }
 
   /**
@@ -278,6 +294,14 @@ public class SplitTime {
     } 
     return 0L;
   }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
+  }
+
+  public String getIcon() {
+    return this.icon;
+  }
   
   /**
    * Adds a new listener for events occurring in this split.
@@ -313,4 +337,27 @@ public class SplitTime {
   public void update() {
 		this.fireEvent(new SplitEvent(SplitEvent.Type.UPDATE, this));
   }
+
+  public void clearModified() {
+    this.modified = false;
+  }
+
+  public boolean isModified() {
+    return this.modified;
+  }
+
+  public boolean equals(SplitTime st) {
+    if (!this.name.equals(st.getName()))
+      return false;
+    if (this.bestSegment.getValue() != st.getBestSegment().getValue())
+      return false;
+    if (this.bestTime.getValue() != st.getBestTime().getValue())
+      return false;
+    if (this.bestRunTime.getValue() != st.getBestRunTime().getValue())
+      return false;
+    if (!this.icon.equals(st.getIcon()))
+      return false;
+    return true;
+  }
+
 }

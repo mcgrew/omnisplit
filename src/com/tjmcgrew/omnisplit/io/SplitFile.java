@@ -7,6 +7,7 @@ import com.tjmcgrew.omnisplit.util.Time;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import javax.json.*;
 import javax.swing.filechooser.FileFilter;
 
 public class SplitFile {
+
+  public static enum Type { JSON, WSPLIT }
 
   public static Run openJsonFile(String file) {
 		return openJsonFile(new File(file));
@@ -51,11 +54,31 @@ public class SplitFile {
     run.setAttemptCount(object.getInt("attempt_count"));
     run.setStartDelay(Time.parseTime(
         object.getJsonString("start_delay").getString()));
+    run.clearModified();
     return run;
   }
 
   public static void writeJsonFile(Run run) {
-    // not yet implemented
+    JsonObjectBuilder object = Json.createObjectBuilder()
+        .add("width", run.getWidth())
+        .add("height", run.getHeight())
+        .add("attempt_count", run.getAttemptCount())
+        .add("start_delay", run.getStartDelay().toString());
+    for (SplitTime s : run.getSplits()) {
+      object.add("splits", Json.createObjectBuilder()
+                   .add("title", s.getName())
+                   .add("time", s.getBestRunTime().toString())
+                   .add("best_segment", s.getBestSegment().toString())
+                   .add("best_time", s.getBestTime().toString()));
+    }
+    try {
+      JsonWriter writer = Json.createWriter(new FileWriter(run.getFilename()));
+      writer.writeObject(object.build());
+      writer.close();
+      run.clearModified();
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   public static Run openWSplitFile(String file) {
@@ -63,7 +86,6 @@ public class SplitFile {
 	}
 
   public static Run openWSplitFile(File file) {
-		// not yet implemented
     String title = null;
     int attempts = 0;
     long offset = 0;
@@ -104,11 +126,33 @@ public class SplitFile {
 //    for (int i=0; i < icons.length; i++) {
 //      splits.get(i).setIcon(icons[i]);
 //    }
+    run.clearModified();
     return run;
   }
 
   public static void writeWSplitFile(Run run) {
     // not yet implemented
+    try {
+      FileWriter writer = new FileWriter(new File(run.getFilename()));
+      writer.write(String.format("Title=%s\n", run.getName()));
+      writer.write(String.format("Attempts=%d\n", run.getAttemptCount()));
+      writer.write(String.format("Offset=%d\n", run.getStartDelay()));
+      writer.write(String.format("Size=%d,%d\n", 
+          run.getHeight(),run.getWidth()));
+      StringBuilder icons = new StringBuilder("Icons=");
+      for (SplitTime s : run.getSplits()) {
+        // I'm not sure what the second number is supposed to be...
+        writer.write(String.format("%s,0,%s,%s\n", s.getName(), 
+          s.getBestRunTime().toString(), s.getBestSegment().toString()));
+        // Icons aren't supported yet...
+        icons.append(String.format("\"%s\",", s.getIcon()));
+      }
+      writer.write(icons.substring(0, icons.length()-1));
+      writer.close();
+      run.clearModified();
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   private static String [] splitLine( String input, String delimiters, 

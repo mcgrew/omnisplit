@@ -3,6 +3,8 @@ package com.tjmcgrew.omnisplit.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tjmcgrew.omnisplit.io.SplitFile;
+
 import edu.purdue.bbc.util.DaemonListener;
 import edu.purdue.bbc.util.UpdateDaemon;
 
@@ -15,6 +17,7 @@ public class Run extends SplitTime implements DaemonListener {
   private int attemptCount;
   private Time startDelay;
   private String filename;
+  private SplitFile.Type filetype;
 
   /**
    * Creates a new empty run.
@@ -116,6 +119,7 @@ public class Run extends SplitTime implements DaemonListener {
   /**
    * Starts a new timed run.
    */
+  @Override
   public boolean start() {
     if (this.updater == null) {
       this.updater = UpdateDaemon.create(100);
@@ -134,12 +138,14 @@ public class Run extends SplitTime implements DaemonListener {
   /**
    * Pauses the current run.
    */
+  @Override
   public boolean pause() {
 		boolean returnvalue = super.pause();
     this.splits.get(this.currentSplit).pause();
     return returnvalue;
   }
 
+  @Override
   public boolean resume() {
     long shiftAmount = System.currentTimeMillis() - this.pauseTime;
 		if (this.isPaused()) {
@@ -183,6 +189,7 @@ public class Run extends SplitTime implements DaemonListener {
    * @param 
    * @return 
    */
+  @Override
   public void update() {
 		super.update();
     this.splits.get(this.currentSplit).update();
@@ -279,5 +286,52 @@ public class Run extends SplitTime implements DaemonListener {
    */
   public String getFilename() {
     return this.filename;
+  }
+
+  public void setFiletype(SplitFile.Type type) {
+    this.filetype = type;
+  }
+
+  public SplitFile.Type getFiletype() {
+    return this.filetype;
+  }
+
+  @Override
+  public void clearModified() {
+    super.clearModified();
+    for (SplitTime s : this.splits) {
+      s.clearModified();
+    }
+  }
+
+  @Override
+  public boolean isModified() {
+    for (SplitTime s : this.splits) {
+      if (s.isModified())
+        return true;
+    }
+    return this.modified;
+  }
+
+  public boolean equals(Run run) {
+    if (!super.equals(run))
+      return false;
+    if (this.width != run.getWidth())
+      return false;
+    if (this.height != run.getHeight())
+      return false;
+    if (this.attemptCount != run.getAttemptCount()) {
+      return false;
+    }
+    if (this.startDelay.getValue() != run.getStartDelay().getValue())
+      return false;
+    List<SplitTime> otherSplits = run.getSplits();
+    if (splits.size() != otherSplits.size())
+      return false;
+    for (int i=0; i < this.splits.size() ; i++) {
+      if (!this.splits.get(i).equals(otherSplits.get(i)))
+        return false;
+    }
+    return true;
   }
 }

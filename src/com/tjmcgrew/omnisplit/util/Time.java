@@ -34,7 +34,18 @@ public class Time {
    * @return The timestamp.
    */
   public String toString() {
-    return Time.formatTime(value);
+    return this.toString(false);
+  }
+
+  /**
+   * Returns a timestamp in the form hh:mm:ss.xxx as a string.
+   * 
+   * @param forceSign Whether to append a "+" to the beginning of positive
+   *  times.
+   * @return The timestamp.
+   */
+  public String toString(boolean forceSign) {
+    return Time.formatTime(value, forceSign);
   }
 
   /**
