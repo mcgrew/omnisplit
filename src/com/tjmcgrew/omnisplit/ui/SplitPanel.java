@@ -65,13 +65,13 @@ public class SplitPanel extends JPanel implements SplitListener {
             this.currentLabel.setText("");
         } else {
           this.currentLabel.setText(Time.formatTime(
-            time.getTime() - time.getBestTime().getValue(), true));
+            time.getTime() - time.getBestTime().getValue(), true, 2));
         }
         break;
       case END:
         this.currentLabel.setText(Time.formatTime(
-          time.getTime() - time.getBestTime().getValue(), true));
-        this.bestLabel.setText(Time.formatTime(time.getRunTime()));
+          time.getTime() - time.getBestTime().getValue(), true, 2));
+        this.bestLabel.setText(Time.formatTime(time.getRunTime(), false, 2));
         break;
     }
   }

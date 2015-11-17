@@ -31,7 +31,7 @@ public class TestTime extends TestCase {
             value % 1000);
       }
       if (Math.random() > 0.5) {
-        timestamp += 543; //randomly append extra digits
+        timestamp += 343; //randomly append extra digits
       }
       assertEquals(value, Time.parseTime(timestamp));
     }

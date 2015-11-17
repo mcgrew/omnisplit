@@ -80,13 +80,13 @@ public class SplitFile {
     JsonObjectBuilder object = Json.createObjectBuilder()
         .add("title", run.getName())
         .add("attempt_count", run.getAttemptCount())
-        .add("start_delay", run.getStartDelay().toString());
+        .add("start_delay", run.getStartDelay().format(3));
     for (SplitTime s : run.getSplits()) {
       jsonSplits.add(Json.createObjectBuilder()
                    .add("title", s.getName())
-                   .add("time", s.getBestRunTime().toString())
-                   .add("best_segment", s.getBestSegment().toString())
-                   .add("best_time", s.getBestTime().toString()).build());
+                   .add("time", s.getBestRunTime().format(3))
+                   .add("best_segment", s.getBestSegment().format(3))
+                   .add("best_time", s.getBestTime().format(3)).build());
     }
     object.add("splits", jsonSplits)
           .add("width", run.getWidth())

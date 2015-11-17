@@ -34,7 +34,20 @@ public class Time {
    * @return The timestamp.
    */
   public String toString() {
-    return this.toString(false);
+    return this.format(false, 2);
+  }
+
+  /**
+   * Returns a timestamp in the form hh:mm:ss.xxx as a string.
+   * 
+   * @param forceSign Whether to append a "+" to the beginning of positive
+   *  times.
+   * @return The timestamp.
+   * @deprecated Use Time.format(bool) instead.
+   */
+  @Deprecated
+  public String toString(boolean forceSign) {
+    return Time.formatTime(value, forceSign, 2);
   }
 
   /**
@@ -44,8 +57,30 @@ public class Time {
    *  times.
    * @return The timestamp.
    */
-  public String toString(boolean forceSign) {
-    return Time.formatTime(value, forceSign);
+  public String format(boolean forceSign) {
+    return Time.formatTime(this.value, forceSign, 2);
+  }
+
+  /**
+   * Returns a timestamp in the form hh:mm:ss.xxx as a string.
+   * 
+   * @param accuracy The number of digits past the decimal to be accurate to.
+   * @return The timestamp.
+   */
+  public String format(int accuracy) {
+    return Time.formatTime(this.value, false, accuracy);
+  }
+
+  /**
+   * Returns a timestamp in the form hh:mm:ss.xxx as a string.
+   * 
+   * @param forceSign Whether to append a "+" to the beginning of positive
+   *  times.
+   * @param accuracy The number of digits past the decimal to be accurate to.
+   * @return The timestamp.
+   */
+  public String format(boolean forceSign, int accuracy) {
+    return Time.formatTime(this.value, forceSign, accuracy);
   }
 
   /**
@@ -174,17 +209,18 @@ public class Time {
   public static long parseTime(String time) {
     Pattern p = null;
     Matcher m = null;
-    long hours, minutes, seconds, msec;
+    long hours, minutes, seconds, sec, msec;
     try {
-      p = Pattern.compile("(?:(?:(\\d+)\\:)?(\\d+)\\:)?(\\d+(?:\\.(\\d+)))?");
+      p = Pattern.compile("(?:(?:(\\d+)\\:)?(\\d+)\\:)?(\\d+)\\.(\\d{3})");
       m = p.matcher(time);
       m.find();
       String hourString = m.group(1);
       String minuteString = m.group(2);
       hours = (hourString != null) ? Long.parseLong(hourString) : 0L;
       minutes = (minuteString != null) ? Long.parseLong(minuteString) : 0L;
-      msec = (long)(Double.parseDouble(m.group(3))*1000);
-      return msec + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
+      sec = Long.parseLong(m.group(3));
+      msec = Long.parseLong(m.group(4));
+      return msec + sec * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
     } catch (IllegalStateException e) {
       System.out.printf("Pattern: %s\n", p.toString());
       System.out.printf("Input:   %s\n", time);
@@ -202,7 +238,7 @@ public class Time {
    * @return The timestamp.
    */
   public static String formatTime(long time) {
-    return formatTime(time, false);
+    return formatTime(time, false, 2);
   }
 
   /**
@@ -212,22 +248,28 @@ public class Time {
    * @param forceSign force display of '+' for positive numbers
    * @return A string containing the formatted time.
    */
-  public static String formatTime(long time, boolean forceSign) {
+  public static String formatTime(long time, boolean forceSign, int accuracy) {
     String first = forceSign ? "%+d" : "%d";
-    int ms = (int)(time % 1000) / 10; // actually centiseconds...
+    if (accuracy > 3)
+      accuracy = 3;
+    if (accuracy < 1)
+      accuracy = -1; // to omit the decimal.
+    String returnvalue;
+    int ms = (int)(time % 1000);
     int sec = (int)(time / 1000 % 60);
     int min = (int)(time / 60000 % 60);
     int hours = (int)(time / 3600000);
     if (Math.abs(time) < 60000) {
       first = (forceSign && time > 0) ? "+" : "";
-      return String.format( first + "%d.%02d", sec, Math.abs(ms));
+      returnvalue = String.format( first + "%d.%03d", sec, Math.abs(ms));
     } else if (Math.abs(time) < 3600000) {
-      return String.format(first + ":%02d.%02d", min, Math.abs(sec), 
+      returnvalue = String.format(first + ":%02d.%03d", min, Math.abs(sec), 
         Math.abs(ms));
     } else {
-      return String.format(first + "%2d:%02d.%02d", hours, Math.abs(min), 
+      returnvalue = String.format(first + "%2d:%02d.%03d", hours, Math.abs(min), 
           Math.abs(sec), Math.abs(ms));
     }
+    return returnvalue.substring(0, returnvalue.length() - 3 + accuracy);
   }
 
 }
