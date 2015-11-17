@@ -69,8 +69,12 @@ public class SplitFile {
     run.setWidth(object.getInt("width"));
     run.setHeight(object.getInt("height"));
     run.setAttemptCount(object.getInt("attempt_count"));
-    run.setStartDelay(Time.parseTime(
-        object.getJsonString("start_delay").getString()));
+    if (object.containsKey("start_delay")) {
+      run.setStartDelay(Time.parseTime(
+          object.getJsonString("start_delay").getString()));
+    }
+    run.setFilename(file.getAbsolutePath());
+    run.setFiletype(Type.JSON);
     run.clearModified();
     return run;
   }
@@ -149,6 +153,8 @@ public class SplitFile {
 //    for (int i=0; i < icons.length; i++) {
 //      splits.get(i).setIcon(icons[i]);
 //    }
+    run.setFilename(file.getAbsolutePath());
+    run.setFiletype(Type.WSPLIT);
     run.clearModified();
     return run;
   }

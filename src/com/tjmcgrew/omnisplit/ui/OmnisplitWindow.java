@@ -133,8 +133,9 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   }
 
   public void openFile() {
-		String lastOpenCSV = Settings.getSettings( ).getProperty( 
-			"history.open.last" );
+//		String lastOpenCSV = Settings.getSettings( ).getProperty( 
+//			"history.open.last" );
+		String lastOpenCSV = "./"; // temporary
 		JFileChooser fc;
 		if ( lastOpenCSV != null ) {
 			fc = new JFileChooser( 
@@ -148,12 +149,24 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
 		if ( options == JFileChooser.APPROVE_OPTION ) {
 //			FileFilter fileFilter = fc.getFileFilter( );
 			File selected = fc.getSelectedFile( );
+      System.out.println(selected.toString());
 //			Settings.getSettings( ).setProperty( "history.open.last", 
 //				selected.getAbsolutePath( ));
 			Run run = SplitFile.openJsonFile(selected);
 			this.runPanel = new RunPanel(run);
 			this.add(this.runPanel, BorderLayout.CENTER);
+//      this.menu = new ContextMenu(this.runPanel);
 		}
+  }
+
+  public void saveFile() {
+    if (this.runPanel != null) {
+    }
+  }
+
+  public void saveFileAs() {
+    if (this.runPanel != null) {
+    }
   }
 
   public static OmnisplitWindow newWindow() {
@@ -204,30 +217,43 @@ public class OmnisplitWindow extends JFrame implements MouseInputListener,
   public void keyPressed(KeyEvent e) {
     int code = e.getKeyCode();
     int modifiers = e.getModifiers();
-    if (modifiers == InputEvent.CTRL_MASK || modifiers == InputEvent.META_MASK) {
+    if ((modifiers & (InputEvent.CTRL_MASK | InputEvent.META_MASK)) != 0) {
       switch (code) {
-        case KeyEvent.VK_0:
+        case KeyEvent.VK_O:
           System.out.println("Open file");
+          this.openFile();
+          break;
+        case KeyEvent.VK_S:
+          if ((modifiers & InputEvent.SHIFT_MASK) != 0) {
+          this.saveFileAs();
+          } else {
+          this.saveFile();
+          }
+          break;
+        case KeyEvent.VK_Q:
+          this.dispose();
           break;
         default:
           break;
       }
     } else {
-      Run run = this.runPanel.getRun();
-      switch (code) {
-        case KeyEvent.VK_SPACE:
-          if (run.isPaused())
-            run.resume();
-          else if (run.isActive())
-            run.next();
-          else if (!run.isStarted())
-            run.start();
-          break;
-        case KeyEvent.VK_BACK_SPACE:
-          run.pause();
-          break;
-        default:
-          break;
+      if (this.runPanel != null) {
+        Run run = this.runPanel.getRun();
+        switch (code) {
+          case KeyEvent.VK_SPACE:
+            if (run.isPaused())
+              run.resume();
+            else if (run.isActive())
+              run.next();
+            else if (!run.isStarted())
+              run.start();
+            break;
+          case KeyEvent.VK_BACK_SPACE:
+            run.pause();
+            break;
+          default:
+            break;
+        }
       }
     }
   }

@@ -41,11 +41,12 @@ public class RunPanel extends JPanel implements SplitListener {
     spacerPanel.setBackground(OmnisplitWindow.background);
     centerPanel.add(this.splitsPanel, BorderLayout.NORTH);
     centerPanel.add(spacerPanel, BorderLayout.CENTER);
-    JScrollPane scrollPane = new JScrollPane(centerPanel);
-    scrollPane.setBorder(null);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    topPanel.add(scrollPane, BorderLayout.CENTER);
+    topPanel.add(centerPanel, BorderLayout.CENTER);
+//    JScrollPane scrollPane = new JScrollPane(centerPanel);
+//    scrollPane.setBorder(null);
+//    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+//    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//    topPanel.add(scrollPane, BorderLayout.CENTER);
     topPanel.add(mainTimerPanel, BorderLayout.SOUTH);
 
     bottomPanel.add(this.bestPanel);
