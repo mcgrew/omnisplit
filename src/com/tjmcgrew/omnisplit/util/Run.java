@@ -175,10 +175,6 @@ public class Run extends SplitTime implements DaemonListener {
 		}
   }
 
-  public void reset() {
-    this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
-  }
-
   public List<SplitTime> getSplits() {
     return this.splits;
   }
@@ -313,25 +309,30 @@ public class Run extends SplitTime implements DaemonListener {
     return this.modified;
   }
 
-  public boolean equals(Run run) {
-    if (!super.equals(run))
-      return false;
-    if (this.width != run.getWidth())
-      return false;
-    if (this.height != run.getHeight())
-      return false;
-    if (this.attemptCount != run.getAttemptCount()) {
-      return false;
-    }
-    if (this.startDelay.getValue() != run.getStartDelay().getValue())
-      return false;
-    List<SplitTime> otherSplits = run.getSplits();
-    if (splits.size() != otherSplits.size())
-      return false;
-    for (int i=0; i < this.splits.size() ; i++) {
-      if (!this.splits.get(i).equals(otherSplits.get(i)))
-        return false;
-    }
-    return true;
+  @Override
+  public void reset() {
+    this.reset(false);
   }
+
+  @Override
+  public void reset(boolean update) {
+    for (SplitTime s : this.splits) {
+      s.reset(update);
+    }
+    super.reset(update);
+  }
+
+  @Override
+  public void updateTimes() {
+    if (this.getTime() < this.bestRunTime.getValue()) {
+      for (SplitTime s : this.splits) {
+        s.updateRunTime();
+      }
+    }
+    for (SplitTime s : this.splits) {
+      s.updateTimes();
+    }
+    super.updateTimes();
+  }
+
 }

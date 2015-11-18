@@ -54,6 +54,8 @@ public class SplitTime {
    *  the run.
    * @param bestSegment The current best time in milliseconds for this segment 
    *  of the run.
+   * @param bestRunTime The time in milliseconds from the beginning of 
+   *  the best run.
    */
   public SplitTime(String name, long bestRunTime, long bestSegment, long bestTime) {
     this.name = name;
@@ -346,18 +348,27 @@ public class SplitTime {
     return this.modified;
   }
 
-  public boolean equals(SplitTime st) {
-    if (!this.name.equals(st.getName()))
-      return false;
-    if (this.bestSegment.getValue() != st.getBestSegment().getValue())
-      return false;
-    if (this.bestTime.getValue() != st.getBestTime().getValue())
-      return false;
-    if (this.bestRunTime.getValue() != st.getBestRunTime().getValue())
-      return false;
-    if (!this.icon.equals(st.getIcon()))
-      return false;
-    return true;
+  public void reset() {
+    this.reset(false);
   }
 
+  public void reset(boolean update) {
+    if (update)
+      this.updateTimes();
+    this.startTime = this.pauseTime = this.endTime = Long.MIN_VALUE;
+  }
+
+  public void updateTimes() {
+    if (this.getTime() < this.bestRunTime.getValue()) {
+      this.setBestRunTime(this.getTime());
+    }
+    if (this.getSegmentTime() < this.bestSegment.getValue()) {
+      this.setBestSegment(this.getSegmentTime());
+    }
+  }
+
+  public void updateRunTime() {
+    this.modified = true;
+    this.setBestRunTime(this.getRunTime());
+  }
 }
