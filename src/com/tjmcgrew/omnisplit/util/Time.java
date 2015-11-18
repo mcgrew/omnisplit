@@ -260,13 +260,12 @@ public class Time {
     int min = (int)(time / 60000 % 60);
     int hours = (int)(time / 3600000);
     if (Math.abs(time) < 60000) {
-      first = (forceSign && time > 0) ? "+" : "";
-      returnvalue = String.format( first + "%d.%03d", sec, Math.abs(ms));
+      returnvalue = String.format( first + ".%03d", sec, Math.abs(ms));
     } else if (Math.abs(time) < 3600000) {
       returnvalue = String.format(first + ":%02d.%03d", min, Math.abs(sec), 
         Math.abs(ms));
     } else {
-      returnvalue = String.format(first + "%2d:%02d.%03d", hours, Math.abs(min), 
+      returnvalue = String.format(first + ":%02d:%02d.%03d", hours, Math.abs(min), 
           Math.abs(sec), Math.abs(ms));
     }
     return returnvalue.substring(0, returnvalue.length() - 3 + accuracy);
