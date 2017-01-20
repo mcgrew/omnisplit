@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  background-color: black;
+  color: white;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+splits, split, split-time, current-time, split-name,
+title, time, attempt, footer-entry { 
+  display: block;
+}
+
+splits-name {
+  display: block;
+  text-align: center;
+  font-weight: bold;
+}
+
+split {
+  border-bottom: 1px solid #1e1e1e;
+}
+
+split current-time, split split-time {
+  float: right;
+  text-align: right;
+  width: 20%;
+  padding: 0 2%;
+}
+
+split.active {
+  background-color: white;
+  color: black;
+}
+
+main-timer {
+  display: block;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: right;
+  background-color: #1e1e1e;
+  padding: 2%;
+}
+
+msec {
+  font-size: 0.5em;
+}
