@@ -1,6 +1,7 @@
-Class = require('simple-class')["Class"];
+Class = require('simple-class').Class
 Mustache = require('mustache');
 $ = require('jquery');
+file = require('./file.js')
 
 UIElement = Class.extend({
   init: function(args, parent) {
@@ -27,6 +28,9 @@ UIElement = Class.extend({
   },
   update: function(args) {
     // TODO: implement this
+  },
+  destroy: function() {
+    this.jquery.remove();
   },
   template: '<div/>'
 });
@@ -276,8 +280,8 @@ FooterEntry = UIElement.extend({
                 '<minutes></minutes>' +
                 '<seconds></seconds>' +
                 '<msec></msec>' +
-              '</time>'
-            '</footer-entry>
+              '</time>' +
+            '</footer-entry>'
 });
 
 Time = {
@@ -301,6 +305,19 @@ Time = {
     return returnvalue;
   },
   parse: function(time) {
+    if (typeof time == "string") {
+      timeParts = time.split(':');
+      time = Number(timeParts.pop());
+      if (timeParts.length)
+        time += Number(timeParts.pop()) * 60;
+      if (timeParts.length)
+        time += Number(timeParts.pop()) * 3600;
+    }
+    return time;
+  },
+  isTime: function(time) {
+    return time instanceof Number || 
+      /^([+-]?(\d+:){0,2}\d+\.?\d*|\.\d+)$/.test(time)
   }
 };
 

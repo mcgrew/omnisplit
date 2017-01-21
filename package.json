@@ -13,9 +13,12 @@
   "author": "mcgrew",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^1.4.1",
+    "electron": "1.4.1",
+    "object-assign": "4.1.1",
     "jquery": "^3.1.0",
     "simple-class": "1.0.0",
-    "mustache": "^2.3.0"
+    "mustache": "^2.3.0",
+    "choose-file": "0.0.4",
+    "save-as": "^0.1.8"
   }
 }
